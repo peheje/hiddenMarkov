@@ -20,20 +20,21 @@ public class Main {
                 System.out.println(p);
             }
 
-            String seq = sequences.get(0);
-            System.out.println(seq);
-            List<Integer> viterbiPathIdx = calculator.viterbi(model, seq);
+            for (String seq : sequences) {
+                //String seq = sequences.get(0);
+                System.out.println(seq);
+                List<Integer> viterbiPathIdx = calculator.viterbi(model, seq);
 
-            StringBuilder sb = new StringBuilder();
-            for (Integer vp : viterbiPathIdx) {
-                sb.append(model.getHidden().get(vp));
+                StringBuilder sb = new StringBuilder();
+                for (Integer vp : viterbiPathIdx) {
+                    sb.append(model.getHidden().get(vp));
+                }
+
+                String viterbiPath = sb.toString();
+                System.out.println(viterbiPath);
+                double p = calculator.JointLogProbability(model, seq, viterbiPath);
+                System.out.println("Viterby path joint log propability: " + p);
             }
-
-            String viterbiPath = sb.toString();
-            System.out.println(viterbiPath);
-            //double p = calculator.JointLogProbability(model, seq, viterbiPath);
-            // System.out.println("Viterby path joint log propability: " + p);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

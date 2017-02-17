@@ -68,33 +68,27 @@ public class MarkovCalculator {
         SimpleMatrix w = new SimpleMatrix(K, N);
 
         Map<Character, Integer> xmap = m.getObservablesMap();
-        List<Integer> path = new LinkedList<>();
-        List<Double> nodeVertices = new ArrayList<>();
+        List<Integer> path = new LinkedList<>();            // Final path.
+        List<Double> nodeVertices = new ArrayList<>();      // Temporary for each node to determine its propability.
+        List<Edge> columnVertices = new ArrayList<>();      // Temporary vertices in a column.
+        List<List<Edge>> matrixVertices = new ArrayList<>();// All vertives for matrix.
 
         System.out.println("N Observations: " + N);
 
         // First step
-        int firstMaxRowIdx = -1;
-        double firstMaxVal = -Double.MAX_VALUE;
         for (int r = 0; r < K; r++) {
             double sta = pi.get(r);
             double emi = O.get(r, xmap.get(x.charAt(0)));
             double res = Math.log(sta) + Math.log(emi);
             //double res = sta * emi;
             w.set(r, 0, res);
-
-            if (res > firstMaxVal) {
-                firstMaxVal = res;
-                firstMaxRowIdx = r;
-            }
+            columnVertices.add(new Edge(0, r, res));
         }
-        //path.add(firstMaxRowIdx);
+        matrixVertices.add(columnVertices);
 
         // Next steps
-        List<List<Edge>> matrixVertices = new ArrayList<>();
-        List<Edge> columnVertices = new ArrayList<>();
         for (int c = 1; c < N; c++) {
-            columnVertices.clear();
+            columnVertices = new ArrayList<>();
             for (int r = 0; r < K; r++) {
                 nodeVertices.clear();
                 for (int k = 0; k < K; k++) {
@@ -112,10 +106,13 @@ public class MarkovCalculator {
             matrixVertices.add(columnVertices);
         }
 
-        for (int i = matrixVertices.size() - 1; i >= 0; i--) {
+        Edge lastBest = matrixVertices.get(matrixVertices.size() - 1).stream().max(Comparator.comparingDouble(e -> e.value)).get();
+        path.add(0, lastBest.toRow);
+
+        for (int i = matrixVertices.size() - 2; i > -1; i--) {
             List<Edge> edges = matrixVertices.get(i);
             Edge max = edges.stream().max(Comparator.comparingDouble(e -> e.value)).get();
-            path.add(0, max.toRow);
+            path.add(0, max.fromRow);
         }
 
         w.print();
