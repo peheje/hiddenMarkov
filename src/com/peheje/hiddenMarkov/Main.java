@@ -31,9 +31,8 @@ public class Main {
 
             String viterbiPath = sb.toString();
             System.out.println(viterbiPath);
-            double p = calculator.JointLogProbability(model, seq, viterbiPath);
-
-            System.out.println("Viterby path joint log propability: " + p);
+            //double p = calculator.JointLogProbability(model, seq, viterbiPath);
+            // System.out.println("Viterby path joint log propability: " + p);
 
         } catch (Exception e) {
             e.printStackTrace();

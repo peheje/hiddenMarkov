@@ -68,7 +68,7 @@ public class MarkovCalculator {
         SimpleMatrix w = new SimpleMatrix(K, N);
 
         Map<Character, Integer> xmap = m.getObservablesMap();
-        List<Integer> path = new ArrayList<>();
+        List<Integer> path = new LinkedList<>();
         List<Double> nodeVertices = new ArrayList<>();
 
         System.out.println("N Observations: " + N);
@@ -88,9 +88,10 @@ public class MarkovCalculator {
                 firstMaxRowIdx = r;
             }
         }
-        path.add(firstMaxRowIdx);
+        //path.add(firstMaxRowIdx);
 
         // Next steps
+        List<List<Edge>> matrixVertices = new ArrayList<>();
         List<Edge> columnVertices = new ArrayList<>();
         for (int c = 1; c < N; c++) {
             columnVertices.clear();
@@ -108,8 +109,13 @@ public class MarkovCalculator {
                 Double max = Collections.max(nodeVertices);
                 w.set(r, c, max);
             }
-            Edge max = columnVertices.stream().max(Comparator.comparingDouble(e -> e.value)).get();
-            path.add(max.fromRow);
+            matrixVertices.add(columnVertices);
+        }
+
+        for (int i = matrixVertices.size() - 1; i >= 0; i--) {
+            List<Edge> edges = matrixVertices.get(i);
+            Edge max = edges.stream().max(Comparator.comparingDouble(e -> e.value)).get();
+            path.add(0, max.toRow);
         }
 
         w.print();
