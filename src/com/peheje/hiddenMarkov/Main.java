@@ -24,6 +24,7 @@ public class Main {
       for (int i = 0; i < sequences.size(); i++) {
         String seq = sequences.get(i);
         String state = states.get(i);
+        System.out.println("Seq: " + (i + 1));
         System.out.println(seq);
         List<Integer> viterbiPathIdx = calculator.viterbi(model, seq);
 

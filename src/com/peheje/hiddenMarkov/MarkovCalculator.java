@@ -69,9 +69,9 @@ public class MarkovCalculator {
 
     // First step
     for (int r = 0; r < K; r++) {
-      double sta = pi.get(r);
+      double ini = pi.get(r);
       double emi = O.get(r, xmap.get(x.charAt(0)));
-      double res = Math.log(sta) + Math.log(emi);
+      double res = Math.log(ini) + Math.log(emi);
       //double res = sta * emi;
       w.set(r, 0, res);
       columnVertices.add(new Edge(0, r, res));
@@ -80,7 +80,7 @@ public class MarkovCalculator {
 
     // Next steps
     for (int c = 1; c < N; c++) {
-      columnVertices = new ArrayList<>();
+      columnVertices = new ArrayList<>(K*K);
       for (int r = 0; r < K; r++) {
         nodeVertices.clear();
         for (int k = 0; k < K; k++) {
