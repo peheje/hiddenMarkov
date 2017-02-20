@@ -21,7 +21,7 @@ public class Main {
 
       System.out.println("\n\n");
 
-      for (int i = 0; i < 1; i++) {
+      for (int i = 0; i < sequences.size(); i++) {
         String seq = sequences.get(i);
         String state = states.get(i);
         System.out.println("Seq: " + (i + 1));

@@ -60,8 +60,9 @@ public class MarkovCalculator {
     SimpleMatrix w = new SimpleMatrix(K, N);
 
     Map<Character, Integer> xmap = m.getObservablesMap();
-    List<Edge> nodeVertices = new ArrayList<>();            // Temporary for each node to determine its propability.
-    List<Edge> path = new LinkedList<>();
+    List<Edge> nodeVertices;
+    Edge maxCol;
+    List<Edge> path = new ArrayList<>();
 
     System.out.println("N Observations: " + N);
 
@@ -74,9 +75,8 @@ public class MarkovCalculator {
     }
 
     // Next steps
-    Edge colMax;
     for (int c = 1; c < N; c++) {
-      colMax = new Edge(-1, -Double.MAX_VALUE);
+      maxCol = new Edge(-1, -Double.MAX_VALUE);
       for (int r = 0; r < K; r++) {
         nodeVertices = new ArrayList<>();
         for (int k = 0; k < K; k++) {
@@ -86,30 +86,30 @@ public class MarkovCalculator {
           double res = pre + Math.log(tra) + Math.log(emi); //double res = pre * tra * emi;
           nodeVertices.add(new Edge(k, res));
         }
-        Edge nodeMax = Collections.max(nodeVertices);
-        w.set(r, c, nodeMax.value);
+        Edge maxNode = Collections.max(nodeVertices);
+        w.set(r, c, maxNode.value);
 
-        if (nodeMax.value > colMax.value)
-          colMax = nodeMax;
+        if (maxNode.value > maxCol.value)
+          maxCol = maxNode;
       }
-      path.add(0, colMax);
+      path.add(maxCol);
     }
 
+    // Last step
     double last = -Double.MAX_VALUE;
     int lastIdx = -1;
     for (int i = 0; i < K; i++) {
-      double v = w.get(i, w.numCols() - 1);
+      double v = w.get(i, N - 1);
       if (v > last) {
         last = v;
         lastIdx = i;
       }
     }
 
-    path.add(0, new Edge(lastIdx, last));
+    path.add(new Edge(lastIdx, last));
 
     w.print(1, 2);
 
-    Collections.reverse(path);
     return path.stream().map(p -> p.cameFrom).collect(Collectors.toList());
   }
 
