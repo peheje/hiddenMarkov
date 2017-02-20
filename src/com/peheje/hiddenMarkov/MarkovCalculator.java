@@ -101,7 +101,7 @@ public class MarkovCalculator {
 
     path.add(0, pathColumn);
 
-    // Backtrack
+    // Backtracking by calculations
     columnLoop:
     for (int c = N - 1; c > 0; c--) {
       for (int k = 0; k < K; k++) {
@@ -110,6 +110,7 @@ public class MarkovCalculator {
         double emi = O.get(pathColumn, xmap.get(x.charAt(c)));
         double res = pre + Math.log(tra) + Math.log(emi);
         if (res == w.get(pathColumn, c)) {
+          // This is the most likely path that lead us here.
           pathColumn = k;
           path.add(0, k);
           continue columnLoop;
