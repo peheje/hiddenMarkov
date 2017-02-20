@@ -2,7 +2,6 @@ package com.peheje.hiddenMarkov;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,10 +59,10 @@ public class MarkovCalculator {
     SimpleMatrix w = new SimpleMatrix(K, N);
 
     Map<Character, Integer> xmap = m.getObservablesMap();
-    List<Integer> path = new LinkedList<>();            // Final path.
-    List<Double> nodeVertices = new ArrayList<>();      // Temporary for each node to determine its propability.
-    List<Edge> columnVertices = new ArrayList<>();      // Temporary vertices in a column.
-    List<List<Edge>> matrixVertices = new ArrayList<>();// All vertives for matrix.
+    List<Integer> path = new LinkedList<>();                  // Final path.
+    List<Double> nodeVertices = new ArrayList<>();            // Temporary for each node to determine its propability.
+    List<Edge> columnVertices;                                // Temporary vertices in a column.
+    List<List<Edge>> matrixVertices = new ArrayList<>(N); // All vertices for matrix.
 
     System.out.println("N Observations: " + N);
 
@@ -71,24 +70,20 @@ public class MarkovCalculator {
     for (int r = 0; r < K; r++) {
       double ini = pi.get(r);
       double emi = O.get(r, xmap.get(x.charAt(0)));
-      double res = Math.log(ini) + Math.log(emi);
-      //double res = sta * emi;
+      double res = Math.log(ini) + Math.log(emi); //double res = ini * emi;
       w.set(r, 0, res);
-      columnVertices.add(new Edge(0, r, res));
     }
-    matrixVertices.add(columnVertices);
 
     // Next steps
     for (int c = 1; c < N; c++) {
-      columnVertices = new ArrayList<>(K*K);
+      columnVertices = new ArrayList<>(K * K);
       for (int r = 0; r < K; r++) {
         nodeVertices.clear();
         for (int k = 0; k < K; k++) {
           double pre = w.get(k, c - 1);
           double tra = A.get(k, r);
           double emi = O.get(r, xmap.get(x.charAt(c)));
-          double res = pre + Math.log(tra) + Math.log(emi);
-          //double res = pre * tra * emi;
+          double res = pre + Math.log(tra) + Math.log(emi); //double res = pre * tra * emi;
           nodeVertices.add(res);
           columnVertices.add(new Edge(k, r, res));
         }
@@ -98,15 +93,13 @@ public class MarkovCalculator {
       matrixVertices.add(columnVertices);
     }
 
-    Edge lastBest = matrixVertices.get(matrixVertices.size() - 1)
-        .stream()
-        .max(Comparator.comparingDouble(e -> e.value)).get();
-    path.add(0, lastBest.toRow);
+    Edge maxLast = Collections.max(matrixVertices.get(matrixVertices.size() - 1));
+    path.add(0, maxLast.toRow);
 
-    for (int i = matrixVertices.size() - 2; i > -1; i--) {
+    for (int i = matrixVertices.size() - 1; i >= 0; i--) {
       List<Edge> edges = matrixVertices.get(i);
-      Edge max = edges.stream().max(Comparator.comparingDouble(e -> e.value)).get();
-      path.add(0, max.fromRow);
+      Edge max = Collections.max(edges);
+      path.add(0, max.toRow);
     }
 
     w.print(1, 2);
@@ -114,7 +107,7 @@ public class MarkovCalculator {
     return path;
   }
 
-  class Edge {
+  class Edge implements Comparable {
 
     private int fromRow;
     private int toRow;
@@ -124,6 +117,11 @@ public class MarkovCalculator {
       this.fromRow = fromRow;
       this.toRow = toRow;
       this.value = value;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+      return Double.compare(value, ((Edge) o).value);
     }
   }
 }

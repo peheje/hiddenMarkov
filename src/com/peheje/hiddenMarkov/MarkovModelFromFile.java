@@ -59,7 +59,7 @@ public class MarkovModelFromFile implements IMarkovModel {
   }
 
   private Map<Character, Integer> Lookup(List<String> list) {
-    Map<Character, Integer> map = new HashMap<>();
+    Map<Character, Integer> map = new HashMap<>(list.size(), 1);
       for (int i = 0; i < list.size(); i++) {
           map.put(list.get(i).charAt(0), i);
       }
