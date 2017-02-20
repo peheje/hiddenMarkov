@@ -2,12 +2,9 @@ package com.peheje.hiddenMarkov;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import org.ejml.data.MatrixIterator64F;
 import org.ejml.simple.SimpleMatrix;
 
 public class MarkovCalculator {
@@ -91,33 +88,31 @@ public class MarkovCalculator {
       }
     }
 
-    // Largest value in last column is starting point for backtrack.
-    int startRow = -1;
+    // Largest value in last column gives starting point for backtrack.
+    int pathColumn = -1;
     double maxValue = -Double.MAX_VALUE;
     for (int i = 0; i < K; i++) {
       double v = w.get(i, N - 1);
       if (v > maxValue) {
         maxValue = v;
-        startRow = i;
+        pathColumn = i;
       }
     }
 
-    path.add(0, startRow);
+    path.add(0, pathColumn);
 
     // Backtrack
     columnLoop:
     for (int c = N - 1; c > 0; c--) {
-      for (int r = startRow; r < K; r++) {
-        for (int k = 0; k < K; k++) {
-          double pre = w.get(k, c - 1);
-          double tra = A.get(k, r);
-          double emi = O.get(r, xmap.get(x.charAt(c)));
-          double res = pre + Math.log(tra) + Math.log(emi);
-          if (res == w.get(r, c)) {
-            startRow = k;
-            path.add(0, k);
-            continue columnLoop;
-          }
+      for (int k = 0; k < K; k++) {
+        double pre = w.get(k, c - 1);
+        double tra = A.get(k, pathColumn);
+        double emi = O.get(pathColumn, xmap.get(x.charAt(c)));
+        double res = pre + Math.log(tra) + Math.log(emi);
+        if (res == w.get(pathColumn, c)) {
+          pathColumn = k;
+          path.add(0, k);
+          continue columnLoop;
         }
       }
     }

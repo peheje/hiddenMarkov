@@ -34,19 +34,19 @@ public class MarkovModelFromFile implements IMarkovModel {
             .collect(Collectors.toList());
       } else if (l.contains("transitions")) {
         List<List<Double>> matrix = new ArrayList<>();
-          for (int j = i + 1; j < lines.size() && lines.get(j).length() > 0; j++) {
-              matrix.add(Arrays.stream(lines.get(j).split(" ")).map(Double::parseDouble)
-                      .collect(Collectors.toList()));
-          }
+        for (int j = i + 1; j < lines.size() && lines.get(j).length() > 0; j++) {
+          matrix.add(Arrays.stream(lines.get(j).split(" ")).map(Double::parseDouble)
+              .collect(Collectors.toList()));
+        }
         double[][] doubles = matrix.stream().map(x -> x.stream().mapToDouble(p -> p).toArray())
             .toArray(double[][]::new);
         transitions = new SimpleMatrix(doubles);
       } else if (l.contains("emissions")) {
         List<List<Double>> matrix = new ArrayList<>();
-          for (int j = i + 1; j < lines.size() && lines.get(j).length() > 0; j++) {
-              matrix.add(Arrays.stream(lines.get(j).split(" ")).map(Double::parseDouble)
-                      .collect(Collectors.toList()));
-          }
+        for (int j = i + 1; j < lines.size() && lines.get(j).length() > 0; j++) {
+          matrix.add(Arrays.stream(lines.get(j).split(" ")).map(Double::parseDouble)
+              .collect(Collectors.toList()));
+        }
         double[][] doubles = matrix.stream().map(x -> x.stream().mapToDouble(p -> p).toArray())
             .toArray(double[][]::new);
         emissions = new SimpleMatrix(doubles);
@@ -60,9 +60,9 @@ public class MarkovModelFromFile implements IMarkovModel {
 
   private Map<Character, Integer> Lookup(List<String> list) {
     Map<Character, Integer> map = new HashMap<>();
-      for (int i = 0; i < list.size(); i++) {
-          map.put(list.get(i).charAt(0), i);
-      }
+    for (int i = 0; i < list.size(); i++) {
+      map.put(list.get(i).charAt(0), i);
+    }
     return map;
   }
 
