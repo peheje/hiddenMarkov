@@ -3,7 +3,6 @@ package com.peheje.hiddenMarkov;
 import java.util.List;
 
 public class Main {
-someoneBreakCode
   public static void main(String[] args) {
     try {
       String dir = System.getProperty("user.dir");
