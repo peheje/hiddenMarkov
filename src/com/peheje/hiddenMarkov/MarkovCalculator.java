@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.ejml.data.MatrixIterator64F;
 import org.ejml.simple.SimpleMatrix;
 
 public class MarkovCalculator {
@@ -60,8 +62,8 @@ public class MarkovCalculator {
     SimpleMatrix w = new SimpleMatrix(K, N);
 
     Map<Character, Integer> xmap = m.getObservablesMap();
-    List<Integer> path = new ArrayList<>();             // Final path.
-    List<Double> nodeVertices = new ArrayList<>();      // Temporary for each node to determine its propability.
+    List<Integer> path = new LinkedList<>();        // Final path.
+    List<Double> nodeVertices = new ArrayList<>(K);  // Find max propability for each node.
 
     System.out.println("N Observations: " + N);
 
@@ -89,39 +91,38 @@ public class MarkovCalculator {
       }
     }
 
-    int maxIdx = -1;
+    // Largest value in last column is starting point for backtrack.
+    int startRow = -1;
     double maxValue = -Double.MAX_VALUE;
     for (int i = 0; i < K; i++) {
       double v = w.get(i, N - 1);
       if (v > maxValue) {
         maxValue = v;
-        maxIdx = i;
+        startRow = i;
       }
     }
+
+    path.add(0, startRow);
 
     // Backtrack
     columnLoop:
     for (int c = N - 1; c > 0; c--) {
-      for (int r = maxIdx; r < K; r++) {
+      for (int r = startRow; r < K; r++) {
         for (int k = 0; k < K; k++) {
           double pre = w.get(k, c - 1);
           double tra = A.get(k, r);
           double emi = O.get(r, xmap.get(x.charAt(c)));
           double res = pre + Math.log(tra) + Math.log(emi);
           if (res == w.get(r, c)) {
-            maxIdx = k;
-            path.add(k);
+            startRow = k;
+            path.add(0, k);
             continue columnLoop;
           }
         }
       }
     }
 
-    path.add(maxIdx);
-
     w.print(1, 2);
-
-    Collections.reverse(path);
 
     return path;
   }
