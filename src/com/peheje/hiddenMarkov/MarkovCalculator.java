@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.ejml.simple.SimpleMatrix;
 
 public class MarkovCalculator {
@@ -59,10 +60,8 @@ public class MarkovCalculator {
     SimpleMatrix w = new SimpleMatrix(K, N);
 
     Map<Character, Integer> xmap = m.getObservablesMap();
-    List<Integer> path = new LinkedList<>();                  // Final path.
-    List<Double> nodeVertices = new ArrayList<>();            // Temporary for each node to determine its propability.
-    List<Edge> columnVertices;                                // Temporary vertices in a column.
-    List<List<Edge>> matrixVertices = new ArrayList<>(N); // All vertices for matrix.
+    List<Edge> nodeVertices = new ArrayList<>();            // Temporary for each node to determine its propability.
+    List<Edge> path = new LinkedList<>();
 
     System.out.println("N Observations: " + N);
 
@@ -75,47 +74,52 @@ public class MarkovCalculator {
     }
 
     // Next steps
+    Edge colMax;
     for (int c = 1; c < N; c++) {
-      columnVertices = new ArrayList<>(K * K);
+      colMax = new Edge(-1, -Double.MAX_VALUE);
       for (int r = 0; r < K; r++) {
-        nodeVertices.clear();
+        nodeVertices = new ArrayList<>();
         for (int k = 0; k < K; k++) {
           double pre = w.get(k, c - 1);
           double tra = A.get(k, r);
           double emi = O.get(r, xmap.get(x.charAt(c)));
           double res = pre + Math.log(tra) + Math.log(emi); //double res = pre * tra * emi;
-          nodeVertices.add(res);
-          columnVertices.add(new Edge(k, r, res));
+          nodeVertices.add(new Edge(k, res));
         }
-        Double max = Collections.max(nodeVertices);
-        w.set(r, c, max);
+        Edge nodeMax = Collections.max(nodeVertices);
+        w.set(r, c, nodeMax.value);
+
+        if (nodeMax.value > colMax.value)
+          colMax = nodeMax;
       }
-      matrixVertices.add(columnVertices);
+      path.add(0, colMax);
     }
 
-    Edge maxLast = Collections.max(matrixVertices.get(matrixVertices.size() - 1));
-    path.add(0, maxLast.toRow);
-
-    for (int i = matrixVertices.size() - 1; i >= 0; i--) {
-      List<Edge> edges = matrixVertices.get(i);
-      Edge max = Collections.max(edges);
-      path.add(0, max.toRow);
+    double last = -Double.MAX_VALUE;
+    int lastIdx = -1;
+    for (int i = 0; i < K; i++) {
+      double v = w.get(i, w.numCols() - 1);
+      if (v > last) {
+        last = v;
+        lastIdx = i;
+      }
     }
+
+    path.add(0, new Edge(lastIdx, last));
 
     w.print(1, 2);
 
-    return path;
+    Collections.reverse(path);
+    return path.stream().map(p -> p.cameFrom).collect(Collectors.toList());
   }
 
   class Edge implements Comparable {
 
-    private int fromRow;
-    private int toRow;
+    private int cameFrom;
     private double value;
 
-    public Edge(int fromRow, int toRow, double value) {
-      this.fromRow = fromRow;
-      this.toRow = toRow;
+    public Edge(int cameFrom, double value) {
+      this.cameFrom = cameFrom;
       this.value = value;
     }
 
