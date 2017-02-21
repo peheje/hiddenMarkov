@@ -60,8 +60,8 @@ public class MarkovCalculator {
     SimpleMatrix w = new SimpleMatrix(K, N);
 
     Map<Character, Integer> xmap = m.getObservablesMap();
-    List<Integer> path = new LinkedList<>();        // Final path.
-    List<Double> nodeVertices = new ArrayList<>(K);  // Find max propability for each node.
+    List<Integer> path = new LinkedList<>();          // Final path.
+    List<Double> nodeVertices = new ArrayList<>(K);   // Find max propability for each node.
 
     //System.out.println("N Observations: " + N);
 
