@@ -16,9 +16,13 @@ public class ObservationsFromFile implements IObservations {
     for (int i = 0; i < lines.size(); i++) {
       String l = lines.get(i);
       if (l.startsWith(">")) {
-        sequences.add(lines.get(i + 1));
+        int o = 1;
+        while (lines.get(i + o).trim().equals("")) o++;
+        sequences.add(lines.get(i + o).trim());
       } else if (l.startsWith("#")) {
-        states.add(lines.get(i + 1));
+        int o = 1;
+        while (lines.get(i + o).trim().equals("")) o++;
+        states.add(lines.get(i + o).trim());
       }
     }
   }

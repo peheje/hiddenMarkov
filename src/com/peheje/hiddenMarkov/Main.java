@@ -13,16 +13,24 @@ public class Main {
       List<String> states = observations.getStates();
 
       MarkovCalculator calculator = new MarkovCalculator();
-      for (int i = 0; i < sequences.size(); i++) {
-        double p = calculator.jointLogProbability(model, sequences.get(i), states.get(i));
-        System.out.println(p);
+
+      if (states.size() == sequences.size()) {
+        for (int i = 0; i < sequences.size(); i++) {
+          double p = calculator.jointLogProbability(model, sequences.get(i), states.get(i));
+          System.out.println(p);
+        }
       }
 
       System.out.println("\n\n");
 
       for (int i = 0; i < sequences.size(); i++) {
         String seq = sequences.get(i);
-        String state = states.get(i);
+
+        String realState = "";
+        if (states.size() == sequences.size()) {
+          realState = states.get(i);
+        }
+
         System.out.println("Seq: " + (i + 1));
         System.out.println(seq);
         List<Integer> viterbiPathIdx = calculator.viterbi(model, seq);
@@ -34,7 +42,7 @@ public class Main {
 
         String viterbiPath = sb.toString();
         System.out.println("Viterbi: " + viterbiPath);
-        System.out.println("Real   : " + state);
+        System.out.println("Real   : " + realState);
         double p = calculator.jointLogProbability(model, seq, viterbiPath);
         System.out.println("Viterby path joint log propability: " + p);
         System.out.println("\n\n");
