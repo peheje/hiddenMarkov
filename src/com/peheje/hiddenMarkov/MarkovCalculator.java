@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javafx.util.Pair;
 import org.ejml.simple.SimpleMatrix;
 
 public class MarkovCalculator {
@@ -45,7 +46,7 @@ public class MarkovCalculator {
 
   // Returns list of most likely path given by rows.
   // E.g. [0, 3, 1] would mean column 0 row 0, column 1 row 3, column 2 row 1.
-  public List<Integer> viterbi(IMarkovModel m, String observed) {
+  public Pair<List<Integer>, SimpleMatrix> viterbi(IMarkovModel m, String observed) {
     int N = observed.length();              // N observations.
     int D = m.getObservables().size();      // D different symbols.
     int K = m.getHidden().size();           // K hidden states.
@@ -62,7 +63,7 @@ public class MarkovCalculator {
     List<Integer> path = new LinkedList<>();        // Final path.
     List<Double> nodeVertices = new ArrayList<>(K);  // Find max propability for each node.
 
-    System.out.println("N Observations: " + N);
+    //System.out.println("N Observations: " + N);
 
     // First step
     for (int r = 0; r < K; r++) {
@@ -118,9 +119,22 @@ public class MarkovCalculator {
       }
     }
 
-    w.print(1, 2);
+    //w.print(1, 2);
 
-    return path;
+    return new Pair<>(path, w);
+  }
+
+  double largestValueInLastColumn(SimpleMatrix m) {
+    int pathColumn = -1;
+    double maxValue = -Double.MAX_VALUE;
+    for (int i = 0; i < m.numRows(); i++) {
+      double v = m.get(i, m.numCols() - 1);
+      if (v > maxValue) {
+        maxValue = v;
+        pathColumn = i;
+      }
+    }
+    return maxValue;
   }
 
   class Edge implements Comparable {

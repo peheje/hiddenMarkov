@@ -8,6 +8,7 @@ import java.util.List;
 
 public class ObservationsFromFile implements IObservations {
 
+  private List<String> names = new ArrayList<>();
   private List<String> sequences = new ArrayList<>();
   private List<String> states = new ArrayList<>();
 
@@ -16,6 +17,7 @@ public class ObservationsFromFile implements IObservations {
     for (int i = 0; i < lines.size(); i++) {
       String l = lines.get(i);
       if (l.startsWith(">")) {
+        names.add(l);
         int o = 1;
         while (lines.get(i + o).trim().equals("")) o++;
         sequences.add(lines.get(i + o).trim());
@@ -35,5 +37,10 @@ public class ObservationsFromFile implements IObservations {
   @Override
   public List<String> getStates() {
     return states;
+  }
+
+  @Override
+  public List<String> getNames() {
+    return names;
   }
 }

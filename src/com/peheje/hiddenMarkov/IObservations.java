@@ -7,4 +7,6 @@ public interface IObservations {
   List<String> getSequences();
 
   List<String> getStates();
+
+  List<String> getNames();
 }
