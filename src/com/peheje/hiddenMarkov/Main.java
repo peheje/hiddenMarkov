@@ -1,8 +1,5 @@
 package com.peheje.hiddenMarkov;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -13,22 +10,52 @@ public class Main {
   }
 
   public static void E3() {
-    try
-    {
+    try {
       String dir = System.getProperty("user.dir");
+      MarkovCalculator calculator = new MarkovCalculator();
+      final int sets = 10;
 
-      IObservations observations = new ObservationsFromFile(null);
-      for (int i = 0; i < 9; i++) {
-        IObservations set = new ObservationsFromFile(dir + "/Dataset160" + "/set160." + i + ".labels.txt");
-        observations.add(set);
+      for (int iSet = 0; iSet < sets; iSet++) {
+        IObservations observations = new ObservationsFromFile(null);
+        int ignoreIdx = 0;
+
+        for (int jSet = 0; jSet < sets; jSet++) {
+          if (jSet == ignoreIdx) {
+            continue;
+          }
+
+          IObservations set = new ObservationsFromFile(
+              dir + "/Dataset160" + "/set160." + jSet + ".labels.txt");
+          observations.add(set);
+        }
+        Character[] hiddenOrder = new Character[]{'i', 'M', 'o'};
+        Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K',
+            'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
+        IMarkovModel countingModel = new MarkovModelFromCounting(observations, hiddenOrder,
+            observableOrder);
+
+        countingModel.getTransitions();
+        countingModel.getEmissions();
+        countingModel.getInitial();
+
+        // Viterbi decoding on ignoreIdx;
+        IObservations set = new ObservationsFromFile(
+            dir + "/Dataset160" + "/set160." + ignoreIdx + ".labels.txt");
+
+        for (int k = 0; k < set.getSequences().size(); k++) {
+          List<Integer> viterbiPathIdx = calculator
+              .viterbi(countingModel, set.getSequences().get(k)).getKey();
+          StringBuilder sb = new StringBuilder();
+          for (Integer vp : viterbiPathIdx) {
+            sb.append(countingModel.getHidden().get(vp));
+          }
+
+          String viterbiPath = sb.toString();
+          System.out.println(viterbiPath);
+        }
+
+        ignoreIdx++;
       }
-      Character[] hiddenOrder = new Character[]{'i', 'M', 'o'};
-      Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
-      IMarkovModel countingModel = new MarkovModelFromCounting(observations, hiddenOrder, observableOrder);
-
-      countingModel.getTransitions();
-      countingModel.getEmissions();
-      countingModel.getInitial();
 
     } catch (Exception e) {
       e.printStackTrace();

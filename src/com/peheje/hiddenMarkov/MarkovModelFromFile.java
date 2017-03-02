@@ -58,14 +58,6 @@ public class MarkovModelFromFile implements IMarkovModel {
 
   }
 
-  private Map<Character, Integer> Lookup(List<String> list) {
-    Map<Character, Integer> map = new HashMap<>();
-    for (int i = 0; i < list.size(); i++) {
-      map.put(list.get(i).charAt(0), i);
-    }
-    return map;
-  }
-
   @Override
   public List<String> getHidden() {
     return hidden;

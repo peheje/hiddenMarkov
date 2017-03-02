@@ -22,22 +22,30 @@ public class MarkovModelFromCounting implements IMarkovModel {
 
   @Override
   public List<String> getHidden() {
-    return null;
+    List<String> ret = new ArrayList<>();
+    for (Character c : stateOrder) {
+      ret.add(c.toString());
+    }
+    return ret;
   }
 
   @Override
   public Map<Character, Integer> getHiddenMap() {
-    return null;
+    return Lookup(getHidden());
   }
 
   @Override
   public List<String> getObservables() {
-    return null;
+    List<String> ret = new ArrayList<>();
+    for (Character c : observableOrder) {
+      ret.add(c.toString());
+    }
+    return ret;
   }
 
   @Override
   public Map<Character, Integer> getObservablesMap() {
-    return null;
+    return Lookup(getObservables());
   }
 
   @Override
