@@ -1,48 +1,23 @@
 package com.peheje.hiddenMarkov;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import org.ejml.simple.SimpleMatrix;
 
 public class MarkovModelFromCounting implements IMarkovModel {
 
+  private final Character[] observableOrder;
+  private final Character[] stateOrder;
   private IObservations observations;
-  private Comparator<Character> hiddenComparator;
-  private Comparator<Character> observableComparator;
 
 
-  public MarkovModelFromCounting(IObservations observations, List<Character> stateOrder,
-      List<Character> observableOrder) {
+  public MarkovModelFromCounting(IObservations observations, Character[] stateOrder,
+      Character[] observableOrder) {
     this.observations = observations;
-
-    this.hiddenComparator = (o1, o2) -> {
-      if (stateOrder != null) {
-        int ai = stateOrder.indexOf(o1);
-        int bi = stateOrder.indexOf(o2);
-        if (ai != -1 && bi != -1) {
-          return Integer.compare(ai, bi);
-        }
-      }
-      return o1 - o2;
-    };
-
-    this.observableComparator = (o1, o2) -> {
-      if (observableOrder != null) {
-        int ai = observableOrder.indexOf(o1);
-        int bi = observableOrder.indexOf(o2);
-        if (ai != -1 && bi != -1) {
-          return Integer.compare(ai, bi);
-        }
-      }
-      return o1 - o2;
-    };
+    this.stateOrder = stateOrder;
+    this.observableOrder = observableOrder;
   }
 
   @Override
@@ -73,144 +48,99 @@ public class MarkovModelFromCounting implements IMarkovModel {
   @Override
   public SimpleMatrix getTransitions() {
 
-    // E.g. { "o": { "i": 3, "M": 1 }, "i": { "o": 5, "M": 8 } }
-    SortedMap<Character, SortedMap<Character, Integer>> oMap = new TreeMap<>(hiddenComparator);
-    List<Character> uniqueStates = uniques(observations.getStates());
+    // Map from character -> index, count
+    Map<Character, IdxCount> stateMap = new HashMap<>();
+    for (int i = 0; i < stateOrder.length; i++) {
+      stateMap.put(stateOrder[i], new IdxCount(i, 0));
+    }
 
-    // Count transitions
-    for (String state : observations.getStates()) {
+    final int K = stateMap.size();
+    SimpleMatrix m = new SimpleMatrix(K, K);
 
-      for (int i = 1; i < state.length(); i++) {
-        Character pre = state.charAt(i - 1);
-        Character cur = state.charAt(i);
-
-        if (!oMap.containsKey(pre)) {
-          SortedMap<Character, Integer> iMap = new TreeMap<>(hiddenComparator);
-          for (Character c : uniqueStates) {
-            iMap.put(c, 0); // Pseudo count?
-          }
-          oMap.put(pre, iMap);
-        }
-        SortedMap<Character, Integer> iMap = oMap.get(pre);
-        iMap.put(cur, iMap.get(cur) + 1);
+    // Count
+    for (String z : observations.getStates()) {
+      for (int i = 0; i < z.length() - 1; i++) {
+        char cur = z.charAt(i);
+        char nex = z.charAt(i + 1);
+        IdxCount curIc = stateMap.get(cur);
+        IdxCount nextIc = stateMap.get(nex);
+        m.set(nextIc.idx, curIc.idx, m.get(nextIc.idx, curIc.idx) + 1);
+        stateMap.get(cur).count++;
       }
     }
 
-    // Count total transitions for each state, using # in map
-    for (Character oKey : oMap.keySet()) {
-      SortedMap<Character, Integer> iMap = oMap.get(oKey);
-      int sum = 0;
-      for (Character iKey : iMap.keySet()) {
-        sum += iMap.get(iKey);
+    // Divide
+    for (int i = 0; i < m.numCols(); i++) {
+      for (int j = 0; j < m.numRows(); j++) {
+        int count = stateMap.get(stateOrder[j]).count;
+        m.set(j, i, m.get(j, i) / (double) count);
       }
-      iMap.put('#', sum);
     }
 
-    // Convert to probability matrix
-    final int k = oMap.size();
-    SimpleMatrix m = new SimpleMatrix(k, k);
-
-    int row = 0;
-    int col = 0;
-    for (Character oKey : oMap.keySet()) {
-      SortedMap<Character, Integer> iMap = oMap.get(oKey);
-      for (Character iKey : iMap.keySet()) {
-        if (!iKey.equals('#')) {
-          m.set(row, col, (double) iMap.get(iKey) / (double) iMap.get('#'));
-          col++;
-        }
-      }
-      row++;
-      col = 0;
-    }
-
-    for (int i = 0; i < k; i++) {
-      SimpleMatrix rowVector = m.extractVector(true, i);
-      double v = rowVector.elementSum();
-      assert v == 1;
-    }
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    System.out.println(gson.toJson(oMap));
     m.print();
-
     return m;
   }
 
   @Override
   public SimpleMatrix getEmissions() {
 
-    // E.g. { "M": {"A": 4, "C": 3, "D": 1 }, "i": { "A": 5, "C": 8, "D": 9 } }
-    Map<Character, Map<Character, Integer>> oMap = new TreeMap<>(hiddenComparator);
+    // Map from character -> index, count
+    Map<Character, IdxCount> observableMap = new HashMap<>();
+    for (int i = 0; i < observableOrder.length; i++) {
+      observableMap.put(observableOrder[i], new IdxCount(i, 0));
+    }
 
-    // Count emissions
+    Map<Character, IdxCount> stateMap = new HashMap<>();
+    for (int i = 0; i < stateOrder.length; i++) {
+      stateMap.put(stateOrder[i], new IdxCount(i, 0));
+    }
+
+    final int K = stateOrder.length;
+    final int D = observableOrder.length;
+
+    SimpleMatrix m = new SimpleMatrix(K, D);
+
+    // Count
     List<String> sequences = observations.getSequences();
     List<String> states = observations.getStates();
-    assert sequences.size() == states.size();
-    int N = sequences.size();
 
-    for (int i = 0; i < N; i++) {
-      String sta = states.get(i);
+    for (int i = 0; i < sequences.size(); i++) {
       String seq = sequences.get(i);
-      assert sta.length() == seq.length();
+      String sta = states.get(i);
 
-      for (int j = 0; j < sta.length(); j++) {
-        Character obs_j = sta.charAt(j);
-        Character cur_j = seq.charAt(j);
+      for (int j = 0; j < seq.length(); j++) {
+        char x = seq.charAt(j);
+        char z = sta.charAt(j);
 
-        if (!oMap.containsKey(obs_j)) {
-          oMap.put(obs_j, new TreeMap<>(observableComparator));
-        } else {
-          Map<Character, Integer> iMap = oMap.get(obs_j);
-          if (iMap.containsKey(cur_j)) {
-            iMap.put(cur_j, iMap.get(cur_j) + 1);
-          } else {
-            iMap.put(cur_j, 1);
-          }
-        }
+        IdxCount xIc = observableMap.get(x);
+        IdxCount zIc = stateMap.get(z);
+
+        m.set(zIc.idx, xIc.idx, m.get(zIc.idx, xIc.idx) + 1);
+        zIc.count++;
       }
     }
 
-    // Count total emissions for each state, using # in map
-    for (Character oKey : oMap.keySet()) {
-      Map<Character, Integer> iMap = oMap.get(oKey);
-      int sum = 0;
-      for (Character iKey : iMap.keySet()) {
-        sum += iMap.get(iKey);
+    // Divide
+    for (int i = 0; i < m.numCols(); i++) {
+      for (int j = 0; j < m.numRows(); j++) {
+        int count = stateMap.get(stateOrder[j]).count;
+        m.set(j, i, m.get(j, i) / (double) count);
       }
-      iMap.put('#', sum);
     }
 
-    // To emission matrix
-    final int k = oMap.size();
-    final int d = uniques(sequences).size();
-
-    SimpleMatrix m = new SimpleMatrix(k, d);
-    int row = 0;
-    int col = 0;
-    for (Character oKey : oMap.keySet()) {
-      Map<Character, Integer> iMap = oMap.get(oKey);
-      for (Character iKey : iMap.keySet()) {
-        if (!iKey.equals('#')) {
-          m.set(row, col, (double) iMap.get(iKey) / (double) iMap.get('#'));
-          col++;
-        }
-      }
-      row++;
-      col = 0;
-    }
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    System.out.println(gson.toJson(oMap));
     m.print();
-
-    for (int i = 0; i < k; i++) {
-      SimpleMatrix rowVector = m.extractVector(true, i);
-      double v = rowVector.elementSum();
-      assert v == 1;
-    }
-
     return m;
+  }
+
+  private class IdxCount {
+
+    int idx;
+    int count;
+
+    public IdxCount(int idx, int count) {
+      this.idx = idx;
+      this.count = count;
+    }
   }
 
   private List<Character> uniques(List<String> list) {

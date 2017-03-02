@@ -17,8 +17,8 @@ public class Main {
     {
       String dir = System.getProperty("user.dir");
       IObservations observations = new ObservationsFromFile(dir + "/Dataset160" + "/set160.0.labels.txt");
-      List<Character> hiddenOrder = Arrays.asList(new Character[]{'i', 'M', 'o'});
-      List<Character> observableOrder = Arrays.asList(new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'});
+      Character[] hiddenOrder = new Character[]{'i', 'M', 'o'};
+      Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
 
       IMarkovModel countingModel = new MarkovModelFromCounting(observations, hiddenOrder, observableOrder);
 
