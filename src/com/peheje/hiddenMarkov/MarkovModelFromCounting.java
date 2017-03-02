@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.ejml.simple.SimpleMatrix;
-import sun.java2d.pipe.SpanShapeRenderer.Simple;
 
 public class MarkovModelFromCounting implements IMarkovModel {
 
@@ -45,30 +44,29 @@ public class MarkovModelFromCounting implements IMarkovModel {
   public SimpleMatrix getTransitions() {
 
     // E.g. { "o": { "i": 3, "M": 1 }, "i": { "o": 5, "M": 8 } }
-    Map<Character, Map<Character, Integer>> outer = new HashMap<>();
+    Map<Character, Map<Character, Integer>> oMap = new HashMap<>();
 
     // Count transitions
     for (String state : observations.getStates()) {
       for (int i = 1; i < state.length(); i++) {
         Character pre = state.charAt(i - 1);
         Character cur = state.charAt(i);
-
-        if (!outer.containsKey(pre)) {
-          outer.put(pre, new HashMap<>());
+        if (!oMap.containsKey(pre)) {
+          oMap.put(pre, new HashMap<>());
         } else {
-          Map<Character, Integer> inner = outer.get(pre);
-          if (inner.containsKey(cur)) {
-            inner.put(cur, inner.get(cur) + 1);
+          Map<Character, Integer> iMap = oMap.get(pre);
+          if (iMap.containsKey(cur)) {
+            iMap.put(cur, iMap.get(cur) + 1);
           } else {
-            inner.put(cur, 1);
+            iMap.put(cur, 1);
           }
         }
       }
     }
 
     // Count total transitions for each state, using # in map
-    for (Character oKey : outer.keySet()) {
-      Map<Character, Integer> iMap = outer.get(oKey);
+    for (Character oKey : oMap.keySet()) {
+      Map<Character, Integer> iMap = oMap.get(oKey);
       int sum = 0;
       for (Character iKey : iMap.keySet()) {
         sum += iMap.get(iKey);
@@ -77,17 +75,27 @@ public class MarkovModelFromCounting implements IMarkovModel {
     }
 
     // Convert to probability matrix
-    int k = outer.size();
+    int k = oMap.size();
     SimpleMatrix m = new SimpleMatrix(k, k);
-
     int row = 0;
     int col = 0;
+    for (Character oKey : oMap.keySet()) {
+      Map<Character, Integer> iMap = oMap.get(oKey);
+      for (Character iKey : iMap.keySet()) {
+        if (!iKey.equals('#')) {
+          m.set(row, col, (double)iMap.get(iKey) / (double)iMap.get('#'));
+          col++;
+        }
+      }
+      row++;
+      col = 0;
+    }
 
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    System.out.println(gson.toJson(outer));
+    System.out.println(gson.toJson(oMap));
     m.print();
 
-    return null;
+    return m;
   }
 
   @Override
