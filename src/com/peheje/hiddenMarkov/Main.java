@@ -16,14 +16,19 @@ public class Main {
     try
     {
       String dir = System.getProperty("user.dir");
-      IObservations observations = new ObservationsFromFile(dir + "/Dataset160" + "/set160.0.labels.txt");
+
+      IObservations observations = new ObservationsFromFile(null);
+      for (int i = 0; i < 9; i++) {
+        IObservations set = new ObservationsFromFile(dir + "/Dataset160" + "/set160." + i + ".labels.txt");
+        observations.add(set);
+      }
       Character[] hiddenOrder = new Character[]{'i', 'M', 'o'};
       Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
-
       IMarkovModel countingModel = new MarkovModelFromCounting(observations, hiddenOrder, observableOrder);
 
       countingModel.getTransitions();
       countingModel.getEmissions();
+      countingModel.getInitial();
 
     } catch (Exception e) {
       e.printStackTrace();

@@ -42,7 +42,33 @@ public class MarkovModelFromCounting implements IMarkovModel {
 
   @Override
   public List<Double> getInitial() {
-    return null;
+    List<Double> pi = new ArrayList<>();
+    List<String> states = observations.getStates();
+
+    Map<Character, IdxCount> stateMap = new HashMap<>();
+    for (int i = 0; i < stateOrder.length; i++) {
+      stateMap.put(stateOrder[i], new IdxCount(i, 0));
+    }
+
+    // Count
+    for (int i = 0; i < states.size(); i++) {
+      String z = states.get(i);
+      char c = z.charAt(0);
+      stateMap.get(c).count++;
+    }
+
+    // Divide
+    for (int i = 0; i < stateMap.size(); i++) {
+      double divided = (double) stateMap.get(stateOrder[i]).count / (double) states.size();
+      pi.add(divided);
+    }
+
+    System.out.println("Initial");
+    for (double d : pi) {
+      System.out.println(d);
+    }
+
+    return pi;
   }
 
   @Override
@@ -62,9 +88,9 @@ public class MarkovModelFromCounting implements IMarkovModel {
       for (int i = 0; i < z.length() - 1; i++) {
         char cur = z.charAt(i);
         char nex = z.charAt(i + 1);
-        IdxCount curIc = stateMap.get(cur);
-        IdxCount nextIc = stateMap.get(nex);
-        m.set(nextIc.idx, curIc.idx, m.get(nextIc.idx, curIc.idx) + 1);
+        IdxCount curm = stateMap.get(cur);
+        IdxCount nextm = stateMap.get(nex);
+        m.set(nextm.idx, curm.idx, m.get(nextm.idx, curm.idx) + 1);
         stateMap.get(cur).count++;
       }
     }
@@ -77,7 +103,8 @@ public class MarkovModelFromCounting implements IMarkovModel {
       }
     }
 
-    m.print();
+    System.out.println("Transitions");
+    m.print(6,6);
     return m;
   }
 
@@ -112,11 +139,11 @@ public class MarkovModelFromCounting implements IMarkovModel {
         char x = seq.charAt(j);
         char z = sta.charAt(j);
 
-        IdxCount xIc = observableMap.get(x);
-        IdxCount zIc = stateMap.get(z);
+        IdxCount xm = observableMap.get(x);
+        IdxCount zm = stateMap.get(z);
 
-        m.set(zIc.idx, xIc.idx, m.get(zIc.idx, xIc.idx) + 1);
-        zIc.count++;
+        m.set(zm.idx, xm.idx, m.get(zm.idx, xm.idx) + 1);
+        zm.count++;
       }
     }
 
@@ -128,7 +155,8 @@ public class MarkovModelFromCounting implements IMarkovModel {
       }
     }
 
-    m.print();
+    System.out.println("Emmisions");
+    m.print(6,6);
     return m;
   }
 
@@ -143,19 +171,4 @@ public class MarkovModelFromCounting implements IMarkovModel {
     }
   }
 
-  private List<Character> uniques(List<String> list) {
-    List<Character> ret = new ArrayList<>();
-    Map<Character, Boolean> counted = new HashMap<>();
-
-    for (String s : list) {
-      for (Character c : s.toCharArray()) {
-        if (!counted.containsKey(c)) {
-          ret.add(c);
-          counted.put(c, true);
-        }
-      }
-    }
-
-    return ret;
-  }
 }

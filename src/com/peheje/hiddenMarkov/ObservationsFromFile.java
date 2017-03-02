@@ -15,6 +15,8 @@ public class ObservationsFromFile implements IObservations {
   private List<String> states = new ArrayList<>();
 
   public ObservationsFromFile(String path) throws IOException {
+    if (path == null) return;
+
     List<String> lines = Files.readAllLines(Paths.get(path), StandardCharsets.ISO_8859_1);
     for (int i = 0; i < lines.size(); i++) {
       String l = lines.get(i);
@@ -48,5 +50,12 @@ public class ObservationsFromFile implements IObservations {
   @Override
   public List<String> getNames() {
     return names;
+  }
+
+  @Override
+  public void add(IObservations other) {
+    sequences.addAll(other.getSequences());
+    states.addAll(other.getStates());
+    names.addAll(other.getNames());
   }
 }

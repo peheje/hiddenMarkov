@@ -9,4 +9,6 @@ public interface IObservations {
   List<String> getStates();
 
   List<String> getNames();
+
+  void add(IObservations other);
 }
