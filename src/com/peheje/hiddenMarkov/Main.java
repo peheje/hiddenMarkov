@@ -1,15 +1,18 @@
 package com.peheje.hiddenMarkov;
 
 import java.util.List;
-import javafx.util.Pair;
-import org.ejml.simple.SimpleMatrix;
 
 public class Main {
+
   public static void main(String[] args) {
+
+  }
+
+  public static void E2() {
     try {
       String dir = System.getProperty("user.dir");
       IMarkovModel model = new MarkovModelFromFile(dir + "/model.txt");
-      IObservations observations = new ObservationsFromFile(dir + "/sequences-project2.txt");
+      IObservations observations = new ObservationsFromFile(dir + "/seq1.txt");
 
       List<String> sequences = observations.getSequences();
       List<String> states = observations.getStates();
@@ -26,7 +29,6 @@ public class Main {
 
       System.out.println("\n\n");
 
-      /*
       for (int i = 0; i < sequences.size(); i++) {
         String seq = sequences.get(i);
 
@@ -37,7 +39,7 @@ public class Main {
 
         System.out.println("Seq: " + (i + 1));
         System.out.println(seq);
-        List<Integer> viterbiPathIdx = calculator.viterbi(model, seq);
+        List<Integer> viterbiPathIdx = calculator.viterbi(model, seq).getKey();
 
         StringBuilder sb = new StringBuilder();
         for (Integer vp : viterbiPathIdx) {
@@ -50,8 +52,8 @@ public class Main {
         double p = calculator.jointLogProbability(model, seq, viterbiPath);
         System.out.println("Viterby path joint log propability: " + p);
         System.out.println("\n\n");
-      }*/
-
+      }
+/*
       for (int i = 0; i < sequences.size(); i++) {
         String name = names.get(i);
         String seq = sequences.get(i);
@@ -71,7 +73,7 @@ public class Main {
         System.out.println("; log P(x,z) (as computer by your log-joint-prob) = " + calculator.jointLogProbability(model, seq, viterbiPath));
         System.out.println("\n");
       }
-
+*/
     } catch (Exception e) {
       e.printStackTrace();
     }
