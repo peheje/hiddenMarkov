@@ -1,5 +1,8 @@
 package com.peheje.hiddenMarkov;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -14,11 +17,13 @@ public class Main {
     {
       String dir = System.getProperty("user.dir");
       IObservations observations = new ObservationsFromFile(dir + "/Dataset160" + "/set160.0.labels.txt");
-      IMarkovModel countingModel = new MarkovModelFromCounting(observations);
+      List<Character> hiddenOrder = Arrays.asList(new Character[]{'i', 'M', 'o'});
+      List<Character> observableOrder = Arrays.asList(new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'});
+
+      IMarkovModel countingModel = new MarkovModelFromCounting(observations, hiddenOrder, observableOrder);
 
       countingModel.getTransitions();
-
-      int x = 0;
+      countingModel.getEmissions();
 
     } catch (Exception e) {
       e.printStackTrace();
