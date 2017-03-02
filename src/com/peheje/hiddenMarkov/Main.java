@@ -5,7 +5,24 @@ import java.util.List;
 public class Main {
 
   public static void main(String[] args) {
+    //E2();
+    E3();
+  }
 
+  public static void E3() {
+    try
+    {
+      String dir = System.getProperty("user.dir");
+      IObservations observations = new ObservationsFromFile(dir + "/Dataset160" + "/set160.0.labels.txt");
+      IMarkovModel countingModel = new MarkovModelFromCounting(observations);
+
+      countingModel.getTransitions();
+
+      int x = 0;
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   public static void E2() {
