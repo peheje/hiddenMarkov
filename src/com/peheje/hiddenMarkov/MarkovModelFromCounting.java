@@ -18,7 +18,8 @@ public class MarkovModelFromCounting implements IMarkovModel {
   private Comparator<Character> observableComparator;
 
 
-  public MarkovModelFromCounting(IObservations observations, List<Character> stateOrder, List<Character> observableOrder) {
+  public MarkovModelFromCounting(IObservations observations, List<Character> stateOrder,
+      List<Character> observableOrder) {
     this.observations = observations;
 
     this.hiddenComparator = (o1, o2) -> {
@@ -78,19 +79,20 @@ public class MarkovModelFromCounting implements IMarkovModel {
 
     // Count transitions
     for (String state : observations.getStates()) {
+
       for (int i = 1; i < state.length(); i++) {
         Character pre = state.charAt(i - 1);
         Character cur = state.charAt(i);
+
         if (!oMap.containsKey(pre)) {
           SortedMap<Character, Integer> iMap = new TreeMap<>(hiddenComparator);
           for (Character c : uniqueStates) {
             iMap.put(c, 0); // Pseudo count?
           }
           oMap.put(pre, iMap);
-        } else {
-          SortedMap<Character, Integer> iMap = oMap.get(pre);
-          iMap.put(cur, iMap.get(cur) + 1);
         }
+        SortedMap<Character, Integer> iMap = oMap.get(pre);
+        iMap.put(cur, iMap.get(cur) + 1);
       }
     }
 
@@ -114,7 +116,7 @@ public class MarkovModelFromCounting implements IMarkovModel {
       SortedMap<Character, Integer> iMap = oMap.get(oKey);
       for (Character iKey : iMap.keySet()) {
         if (!iKey.equals('#')) {
-          m.set(row, col, (double)iMap.get(iKey) / (double)iMap.get('#'));
+          m.set(row, col, (double) iMap.get(iKey) / (double) iMap.get('#'));
           col++;
         }
       }
@@ -190,7 +192,7 @@ public class MarkovModelFromCounting implements IMarkovModel {
       Map<Character, Integer> iMap = oMap.get(oKey);
       for (Character iKey : iMap.keySet()) {
         if (!iKey.equals('#')) {
-          m.set(row, col, (double)iMap.get(iKey) / (double)iMap.get('#'));
+          m.set(row, col, (double) iMap.get(iKey) / (double) iMap.get('#'));
           col++;
         }
       }
