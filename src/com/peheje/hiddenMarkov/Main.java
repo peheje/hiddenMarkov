@@ -1,6 +1,9 @@
 package com.peheje.hiddenMarkov;
 
 import java.util.List;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.util.PythonInterpreter;
 
 public class Main {
 
@@ -11,50 +14,62 @@ public class Main {
 
   public static void E3() {
     try {
-      String dir = System.getProperty("user.dir");
-      MarkovCalculator calculator = new MarkovCalculator();
+      final String dir = System.getProperty("user.dir");
+      final String path = "/Dataset160/set160.";
       final int sets = 10;
+      MarkovCalculator calculator = new MarkovCalculator();
 
-      for (int iSet = 0; iSet < sets; iSet++) {
+      for (int ignore = 0; ignore < sets; ignore++) {
         IObservations observations = new ObservationsFromFile(null);
-        int ignoreIdx = 0;
-
-        for (int jSet = 0; jSet < sets; jSet++) {
-          if (jSet == ignoreIdx) {
+        for (int j = 0; j < sets; j++) {
+          if (j == ignore) {
+            // Ignoring
             continue;
           }
 
           IObservations set = new ObservationsFromFile(
-              dir + "/Dataset160" + "/set160." + jSet + ".labels.txt");
+              dir + path + j + ".labels.txt");
           observations.add(set);
         }
         Character[] hiddenOrder = new Character[]{'i', 'M', 'o'};
         Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K',
             'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
-        IMarkovModel countingModel = new MarkovModelFromCounting(observations, hiddenOrder,
+        IMarkovModel model = new MarkovModelFromCounting(observations, hiddenOrder,
             observableOrder);
 
+        /*
         countingModel.getTransitions();
         countingModel.getEmissions();
         countingModel.getInitial();
+        */
 
-        // Viterbi decoding on ignoreIdx;
+        // Viterbi decoding on the ignored;
         IObservations set = new ObservationsFromFile(
-            dir + "/Dataset160" + "/set160." + ignoreIdx + ".labels.txt");
+            dir + path + ignore + ".labels.txt");
 
         for (int k = 0; k < set.getSequences().size(); k++) {
-          List<Integer> viterbiPathIdx = calculator
-              .viterbi(countingModel, set.getSequences().get(k)).getKey();
+          List<Integer> viterbiIdx = calculator
+              .viterbi(model, set.getSequences().get(k)).getKey();
           StringBuilder sb = new StringBuilder();
-          for (Integer vp : viterbiPathIdx) {
-            sb.append(countingModel.getHidden().get(vp));
+          for (Integer vp : viterbiIdx) {
+            sb.append(model.getHidden().get(vp));
           }
 
           String viterbiPath = sb.toString();
           System.out.println(viterbiPath);
-        }
 
-        ignoreIdx++;
+
+
+          PythonInterpreter interpreter = new PythonInterpreter();
+          interpreter.exec("import sys");
+          interpreter.exec("sys.path.append('/usr/lib/python2.7')");
+
+          interpreter.execfile(dir + "/compare_tm_pred.py");
+          PyObject someFunc = interpreter.get("funcName");
+          PyObject result = someFunc.__call__(new PyString("Test!"));
+          String realResult = (String) result.__tojava__(String.class);
+
+        }
       }
 
     } catch (Exception e) {
