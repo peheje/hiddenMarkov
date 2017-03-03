@@ -2,7 +2,7 @@ package com.peheje.hiddenMarkov;
 
 import java.util.List;
 
-public interface IObservations {
+public interface Observations {
 
   List<String> getSequences();
 
@@ -10,5 +10,5 @@ public interface IObservations {
 
   List<String> getNames();
 
-  void add(IObservations other);
+  void add(Observations other);
 }

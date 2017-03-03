@@ -5,13 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.ejml.simple.SimpleMatrix;
 
-public class MarkovModelFromFile implements IMarkovModel {
+public class MarkovModelFromFile implements MarkovModel {
 
   private List<String> hidden;
   private Map<Character, Integer> hiddenMap;

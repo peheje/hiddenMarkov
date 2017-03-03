@@ -10,7 +10,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class MarkovCalculator {
 
-  public double jointLogProbability(IMarkovModel m, String observedList, String states) {
+  public double jointLogProbability(MarkovModel m, String observedList, String states) {
 
     // Map character that represent 'hidden state' or 'observable state' to the index in our model.
     Map<Character, Integer> hiddenMap = m.getHiddenMap();
@@ -46,7 +46,7 @@ public class MarkovCalculator {
 
   // Returns list of most likely path given by rows.
   // E.g. [0, 3, 1] would mean column 0 row 0, column 1 row 3, column 2 row 1.
-  public Pair<List<Integer>, SimpleMatrix> viterbi(IMarkovModel m, String observed) {
+  public Pair<List<Integer>, SimpleMatrix> viterbi(MarkovModel m, String observed) {
     int N = observed.length();              // N observations.
     int D = m.getObservables().size();      // D different symbols.
     int K = m.getHidden().size();           // K hidden states.

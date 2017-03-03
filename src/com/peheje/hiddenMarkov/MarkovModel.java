@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.ejml.simple.SimpleMatrix;
 
-public interface IMarkovModel {
+public interface MarkovModel {
 
   List<String> getHidden();
 

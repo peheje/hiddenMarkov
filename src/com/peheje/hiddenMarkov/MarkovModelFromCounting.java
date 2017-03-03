@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 import org.ejml.simple.SimpleMatrix;
 
-public class MarkovModelFromCounting implements IMarkovModel {
+public class MarkovModelFromCounting implements MarkovModel {
 
   private final Character[] observableOrder;
   private final Character[] stateOrder;
-  private IObservations observations;
+  private Observations observations;
 
 
-  public MarkovModelFromCounting(IObservations observations, Character[] stateOrder,
+  public MarkovModelFromCounting(Observations observations, Character[] stateOrder,
       Character[] observableOrder) {
     this.observations = observations;
     this.stateOrder = stateOrder;
@@ -97,8 +97,8 @@ public class MarkovModelFromCounting implements IMarkovModel {
         char cur = z.charAt(i);
         char nex = z.charAt(i + 1);
         IdxCount curm = stateMap.get(cur);
-        IdxCount nextm = stateMap.get(nex);
-        m.set(nextm.idx, curm.idx, m.get(nextm.idx, curm.idx) + 1);
+        IdxCount nexm = stateMap.get(nex);
+        m.set(nexm.idx, curm.idx, m.get(nexm.idx, curm.idx) + 1);
         stateMap.get(cur).count++;
       }
     }

@@ -1,6 +1,5 @@
 package com.peheje.hiddenMarkov;
 
-import com.sun.xml.internal.bind.api.impl.NameConverter.Standard;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -8,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ObservationsFromFile implements IObservations {
+public class ObservationsFromFile implements Observations {
 
   private List<String> names = new ArrayList<>();
   private List<String> sequences = new ArrayList<>();
@@ -53,7 +52,7 @@ public class ObservationsFromFile implements IObservations {
   }
 
   @Override
-  public void add(IObservations other) {
+  public void add(Observations other) {
     sequences.addAll(other.getSequences());
     states.addAll(other.getStates());
     names.addAll(other.getNames());
