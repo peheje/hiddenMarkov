@@ -18,14 +18,17 @@ public class Main {
   public static void E3() {
     try {
       final String dir = System.getProperty("user.dir");
-      final String path = "/Dataset160/set160.";
+      final String datasetPath = "/Dataset160/set160.";
       final int sets = 10;
 
+      // Respect this order when creating the matrices
       Character[] hiddenOrder = new Character[]{'i', 'M', 'o'};
       Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K',
           'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
       MarkovCalculator calculator = new MarkovCalculator();
 
+      // Run 10 fold test where we ignore 1 dataset and train by the others.
+      // Then use the ignored to do viterbi and compare with real result.
       for (int ignore = 0; ignore < sets; ignore++) {
         Observations observations = new ObservationsFromFile(null);
         for (int j = 0; j < sets; j++) {
@@ -33,20 +36,20 @@ public class Main {
             // Ignoring
             continue;
           }
-          Observations set = new ObservationsFromFile(
-              dir + path + j + ".labels.txt");
+          // Read observations from file and add it to the observations
+          Observations set = new ObservationsFromFile(dir + datasetPath + j + ".labels.txt");
           observations.add(set);
         }
 
-        MarkovModel model = new MarkovModelFromCounting(observations, hiddenOrder,
-            observableOrder);
+        // Create the markov model by counting
+        MarkovModel model = new MarkovModelFromCounting(observations, hiddenOrder, observableOrder);
 
-        // Viterbi decoding on the ignored:
-        final String ignoredPath = dir + path + ignore + ".labels.txt";
+        // Viterbi decoding on the ignored
+        final String ignoredPath = dir + datasetPath + ignore + ".labels.txt";
         Observations ignoredObservations = new ObservationsFromFile(ignoredPath);
 
+        // Write the result in the fasta format
         BufferedWriter out = new BufferedWriter(new FileWriter(dir + "/pythonCompareOutput.txt"));
-
         for (int k = 0; k < ignoredObservations.getSequences().size(); k++) {
 
           String name = ignoredObservations.getNames().get(k);
@@ -71,6 +74,7 @@ public class Main {
         }
         out.close();
 
+        // Run the python comparing tool proveded by teacher
         String toExec = "python " + dir + "/compare_tm_pred.py " + ignoredPath + " pythonCompareOutput.txt";
         Process p = Runtime.getRuntime().exec(toExec);
         BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -79,14 +83,15 @@ public class Main {
         for (String l; (l = in.readLine()) != null; sb.append(l + "\n"));
         String res = sb.toString();
 
+        // Write the output of the comparing tool to file
         out = new BufferedWriter(new FileWriter(dir + "/resultProject3.txt"));
-        if (ignore == 1) {
+        if (ignore == 0) {
+          // Delete content
           out.write("");
         }
         out.append(res);
         out.close();
       }
-
     } catch (Exception e) {
       e.printStackTrace();
     }
