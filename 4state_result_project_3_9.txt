@@ -1,0 +1,50 @@
+>A15_HUMAN
+Sn = 0.9889, Sp = 0.7417, CC = 0.7601, AC = 0.7606
+
+>CD37_HUMAN
+Sn = 0.9667, Sp = 0.7131, CC = 0.7375, AC = 0.7388
+
+>CD53_HUMAN
+Sn = 0.7283, Sp = 0.6979, CC = 0.4973, AC = 0.4973
+
+>CD63_RAT
+Sn = 1.0000, Sp = 0.7377, CC = 0.7597, AC = 0.7600
+
+>CD81_HUMAN
+Sn = 0.9792, Sp = 0.8174, CC = 0.8149, AC = 0.8150
+
+>CD82_HUMAN
+Sn = 0.9783, Sp = 0.7258, CC = 0.7470, AC = 0.7479
+
+>CD9_CERAE
+Sn = 0.9895, Sp = 0.8868, CC = 0.8885, AC = 0.8885
+
+>CO02_HUMAN
+Sn = 1.0000, Sp = 0.9091, CC = 0.9238, AC = 0.9239
+
+>GPT_CRILO
+Sn = 0.6000, Sp = 0.7947, CC = 0.4669, AC = 0.4672
+
+>HEMA_PI4HA
+Sn = 0.9500, Sp = 1.0000, CC = 0.9738, AC = 0.9741
+
+>IL2B_HUMAN
+Sn = 0.0000, Sp = inf, CC = inf, AC = inf
+
+>IM23_SCHMA
+Sn = 0.9773, Sp = 0.8515, CC = 0.8480, AC = 0.8481
+
+>LHB5_RHOAC
+Sn = 0.6957, Sp = 0.7619, CC = 0.4149, AC = 0.4149
+
+>PBPB_ECOLI
+Sn = 1.0000, Sp = 1.0000, CC = 1.0000, AC = 1.0000
+
+>RHAT_ECOLI
+Sn = 0.9571, Sp = 0.7444, CC = 0.5248, AC = 0.5325
+
+>SECD_ECOLI
+Sn = 0.9127, Sp = 0.9055, CC = 0.8856, AC = 0.8856
+
+Summary (over all sequences):
+Sn = 0.8835, Sp = 0.7928, CC = 0.7753, AC = 0.7757

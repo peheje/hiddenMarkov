@@ -1,14 +1,18 @@
 package com.peheje.hiddenMarkov;
 
-import org.ejml.simple.SimpleMatrix;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.ejml.simple.SimpleMatrix;
 
 public class MarkovFromCounting implements MarkovModel {
 
+  private Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final Character[] observableOrder;
   private final Character[] stateOrder;
   private final List<String> hidden = new ArrayList<>();
@@ -22,7 +26,6 @@ public class MarkovFromCounting implements MarkovModel {
     this.observations = observations;
     this.stateOrder = stateOrder;
     this.observableOrder = observableOrder;
-
 
     for (Character c : stateOrder) {
       this.hidden.add(c.toString());
@@ -57,25 +60,25 @@ public class MarkovFromCounting implements MarkovModel {
 
   @Override
   public List<Double> getInitial() {
-    List<Double> pi = new ArrayList<>();
+
+    // Each dataset contains 16 observation/state pairs. So 9*16 = 144.
     List<String> states = observations.getStates();
 
-    Map<Character, IdxCount> stateMap = new HashMap<>();
-    for (int i = 0; i < stateOrder.length; i++) {
-      stateMap.put(stateOrder[i], new IdxCount(i, 0));
-    }
+    Double[] pi = new Double[stateOrder.length];
+    Arrays.fill(pi, 0.0);
 
     // Count
     for (int i = 0; i < states.size(); i++) {
       String z = states.get(i);
       char c = z.charAt(0);
-      stateMap.get(c).count++;
+      int ci = hiddenLookup.get(c);
+      pi[ci]++;
     }
 
-    // Divide
-    for (int i = 0; i < stateMap.size(); i++) {
-      double divided = (double) stateMap.get(stateOrder[i]).count / (double) states.size();
-      pi.add(divided);
+    System.out.println(gson.toJson(pi));
+
+    for (int i = 0; i < pi.length; i++) {
+      pi[i] /= states.size();
     }
 
     /*System.out.println("Initial");
@@ -83,19 +86,13 @@ public class MarkovFromCounting implements MarkovModel {
       System.out.println(d);
     }*/
 
-    return pi;
+    return Arrays.asList(pi);
   }
 
   @Override
   public SimpleMatrix getTransitions() {
 
-    // Map from character -> index, count
-    Map<Character, IdxCount> stateMap = new HashMap<>();
-    for (int i = 0; i < stateOrder.length; i++) {
-      stateMap.put(stateOrder[i], new IdxCount(i, 0));
-    }
-
-    final int K = stateMap.size();
+    final int K = stateOrder.length;
     SimpleMatrix m = new SimpleMatrix(K, K);
 
     // Count
@@ -103,20 +100,23 @@ public class MarkovFromCounting implements MarkovModel {
       for (int i = 0; i < z.length() - 1; i++) {
         char cur = z.charAt(i);
         char nex = z.charAt(i + 1);
-        IdxCount curm = stateMap.get(cur);
-        IdxCount nexm = stateMap.get(nex);
-        m.set(nexm.idx, curm.idx, m.get(nexm.idx, curm.idx) + 1);
-        stateMap.get(cur).count++;
+        int curi = hiddenLookup.get(cur);
+        int nexi = hiddenLookup.get(nex);
+        m.set(nexi, curi, m.get(nexi, curi) + 1);
       }
     }
 
-    // Divide
-    for (int i = 0; i < m.numCols(); i++) {
-      for (int j = 0; j < m.numRows(); j++) {
-        Character s = stateOrder[j];
-        int count = stateMap.get(s).count;
-        m.set(j, i, m.get(j, i) / (double) count);
+    for (int r = 0; r < m.numRows(); r++) {
+      // Normalize this row
+      int rowSum = (int) m.extractVector(true, r).elementSum();
+      for (int c = 0; c < m.numCols(); c++) {
+        m.set(r, c, m.get(r, c) / rowSum);
       }
+    }
+
+    for (int r = 0; r < m.numRows(); r++) {
+      double s = m.extractVector(true, r).elementSum();
+      assert Math.round(s) == 1;
     }
 
     //System.out.println("Transitions");
@@ -126,17 +126,6 @@ public class MarkovFromCounting implements MarkovModel {
 
   @Override
   public SimpleMatrix getEmissions() {
-
-    // Map from character -> index, count
-    Map<Character, IdxCount> observableMap = new HashMap<>();
-    for (int i = 0; i < observableOrder.length; i++) {
-      observableMap.put(observableOrder[i], new IdxCount(i, 0));
-    }
-
-    Map<Character, IdxCount> stateMap = new HashMap<>();
-    for (int i = 0; i < stateOrder.length; i++) {
-      stateMap.put(stateOrder[i], new IdxCount(i, 0));
-    }
 
     final int K = stateOrder.length;
     final int D = observableOrder.length;
@@ -154,36 +143,29 @@ public class MarkovFromCounting implements MarkovModel {
       for (int j = 0; j < seq.length(); j++) {
         char x = seq.charAt(j);
         char z = sta.charAt(j);
-
-        IdxCount xm = observableMap.get(x);
-        IdxCount zm = stateMap.get(z);
-
-        m.set(zm.idx, xm.idx, m.get(zm.idx, xm.idx) + 1);
-        zm.count++;
+        int xi = observablesLookup.get(x);
+        int zi = hiddenLookup.get(z);
+        m.set(zi, xi, m.get(zi, xi) + 1);
       }
     }
 
-    // Divide
-    for (int i = 0; i < m.numCols(); i++) {
-      for (int j = 0; j < m.numRows(); j++) {
-        int count = stateMap.get(stateOrder[j]).count;
-        m.set(j, i, m.get(j, i) / (double) count);
+    for (int r = 0; r < m.numRows(); r++) {
+      // Normalize this row
+      int rowSum = (int) m.extractVector(true, r).elementSum();
+      for (int c = 0; c < m.numCols(); c++) {
+        m.set(r, c, m.get(r, c) / rowSum);
       }
+    }
+
+    m.print();
+
+    for (int r = 0; r < m.numRows(); r++) {
+      double s = m.extractVector(true, r).elementSum();
+      assert Math.round(s) == 1;
     }
 
     //System.out.println("Emmisions");
     //m.print(6,6);
     return m;
-  }
-
-  private class IdxCount {
-
-    int idx;
-    int count;
-
-    public IdxCount(int idx, int count) {
-      this.idx = idx;
-      this.count = count;
-    }
   }
 }

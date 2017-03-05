@@ -75,16 +75,20 @@ public class Main {
 
           StringBuilder sb = new StringBuilder();
           for (Integer vp : viterbi.getKey()) {
-            sb.append(model.getHidden().get(vp));
+            sb.append(hiddenOrder[vp]);
           }
           String viterbiPath = sb.toString();
+
+          if (stateModel == 4) {
+            viterbiPath = FourStateHelixObservations.fourToThreeState(viterbiPath);
+          }
 
           out.write(viterbiPath);
           out.write("\n");
         }
         out.close();
 
-        // Run the python comparing tool proveded by teacher
+        // Run the python comparing tool proveded by teacher.
         List<String> listResult = new ArrayList<>();
         {
           String toExec = "python " + dir + "/compare_tm_pred.py " + ignorePath + " tmp_kfold.txt";

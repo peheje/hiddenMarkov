@@ -10,6 +10,12 @@ public class FourStateHelixObservations extends ObservationsFromFasta {
     super(path);
   }
 
+  public static String fourToThreeState(String viterbiPath) {
+    viterbiPath = viterbiPath.replace("E", "M");
+    viterbiPath = viterbiPath.replace("L", "M");
+    return viterbiPath;
+  }
+
   @Override
   public List<String> getStates() {
     List<String> originalStates = super.getStates();
@@ -37,8 +43,6 @@ public class FourStateHelixObservations extends ObservationsFromFasta {
       }
       String s = sb.toString();
       assert orig.length() == s.length();
-      System.out.println("original: " + orig);
-      System.out.println("transformed: " + s);
       transformedStates.add(s);
     }
     return transformedStates;
