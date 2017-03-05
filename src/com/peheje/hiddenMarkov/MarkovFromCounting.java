@@ -102,14 +102,15 @@ public class MarkovFromCounting implements MarkovModel {
       }
     }
 
+    // Normalize row-wise
     for (int r = 0; r < m.numRows(); r++) {
-      // Normalize this row
       int rowSum = (int) m.extractVector(true, r).elementSum();
       for (int c = 0; c < m.numCols(); c++) {
         m.set(r, c, m.get(r, c) / rowSum);
       }
     }
 
+    // Assert each row sums to 1
     for (int r = 0; r < m.numRows(); r++) {
       double s = m.extractVector(true, r).elementSum();
       assert Math.round(s) == 1;
@@ -145,6 +146,7 @@ public class MarkovFromCounting implements MarkovModel {
       }
     }
 
+    // Normalize row-wise
     for (int r = 0; r < m.numRows(); r++) {
       // Normalize this row
       int rowSum = (int) m.extractVector(true, r).elementSum();
@@ -153,6 +155,7 @@ public class MarkovFromCounting implements MarkovModel {
       }
     }
 
+    // Assert each row sums to 1
     for (int r = 0; r < m.numRows(); r++) {
       double s = m.extractVector(true, r).elementSum();
       assert Math.round(s) == 1;
