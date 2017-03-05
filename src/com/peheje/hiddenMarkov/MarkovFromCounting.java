@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.ejml.simple.SimpleMatrix;
@@ -74,8 +72,6 @@ public class MarkovFromCounting implements MarkovModel {
       int ci = hiddenLookup.get(c);
       pi[ci]++;
     }
-
-    System.out.println(gson.toJson(pi));
 
     for (int i = 0; i < pi.length; i++) {
       pi[i] /= states.size();
@@ -156,8 +152,6 @@ public class MarkovFromCounting implements MarkovModel {
         m.set(r, c, m.get(r, c) / rowSum);
       }
     }
-
-    m.print();
 
     for (int r = 0; r < m.numRows(); r++) {
       double s = m.extractVector(true, r).elementSum();

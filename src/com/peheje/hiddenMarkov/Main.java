@@ -20,7 +20,7 @@ public class Main {
 
   public static void main(String[] args) {
     //E2();
-    //E3(new Character[]{'i', 'M', 'o'}, "3state");
+    E3(new Character[]{'i', 'M', 'o'}, "3state");
     E3(new Character[]{'i', 'L', 'o', 'E'}, "4state");
   }
 
