@@ -2,6 +2,7 @@ package com.peheje.hiddenMarkov;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.regex.Pattern;
 import javafx.util.Pair;
 import org.ejml.simple.SimpleMatrix;
@@ -67,9 +69,10 @@ public class Main {
           String name = ignoredObservations.getNames().get(k);
           String seq = ignoredObservations.getSequences().get(k);
 
-          out.write(name + "\n");
-          out.write(seq + "\n");
-          out.write("#\n");
+
+          out.write(name + System.lineSeparator());
+          out.write(seq + System.lineSeparator());
+          out.write("#" + System.lineSeparator());
 
           Pair<List<Integer>, SimpleMatrix> viterbi = calculator.viterbi(model, seq);
 
@@ -84,7 +87,7 @@ public class Main {
           }
 
           out.write(viterbiPath);
-          out.write("\n");
+          out.write(System.lineSeparator());
         }
         out.close();
 
@@ -92,6 +95,7 @@ public class Main {
         List<String> listResult = new ArrayList<>();
         {
           String toExec = "python " + dir + "/compare_tm_pred.py " + ignorePath + " tmp_kfold.txt";
+          toExec = toExec.replace("\\", "/");
           Process p = Runtime.getRuntime().exec(toExec);
           BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
           String l;
@@ -113,7 +117,7 @@ public class Main {
         acArr[ignoreIdx] = Double.parseDouble(sn_cc_sp_ac.get(3));
 
         // Write the output of the comparing tool to file.
-        String res = String.join("\n", listResult);
+        String res = String.join(System.lineSeparator(), listResult);
         out = new BufferedWriter(new FileWriter(dir + "/" + prefix + "_result_project_3_" + ignoreIdx + ".txt"));
         if (ignoreIdx == 0) {
           out.write("");  // Delete content
@@ -127,6 +131,7 @@ public class Main {
       Path file = Paths.get(prefix + "_result_project_3_AC.txt");
       Files.write(file, Arrays.asList("AC mean: " + st.getMean(), "AC variance: " + st.getVariance()), StandardCharsets.UTF_8);
     } catch (Exception e) {
+      System.out.println("Need python 2.x.x in path as 'python'");
       e.printStackTrace();
     }
   }
@@ -150,7 +155,7 @@ public class Main {
         }
       }
 
-      System.out.println("\n\n");
+      System.out.println(System.lineSeparator() + System.lineSeparator());
 
       for (int i = 0; i < sequences.size(); i++) {
         String seq = sequences.get(i);
@@ -174,7 +179,7 @@ public class Main {
         System.out.println("Real   : " + realState);
         double p = calculator.jointLogProbability(model, seq, viterbiPath);
         System.out.println("Viterby path joint log propability: " + p);
-        System.out.println("\n\n");
+        System.out.println(System.lineSeparator() + System.lineSeparator());
       }
 /*
       for (int i = 0; i < sequences.size(); i++) {
@@ -194,7 +199,7 @@ public class Main {
         System.out.println(viterbiPath);
         System.out.println("; log P(x,z) (as computed by Viterbi)             = " + calculator.largestValueInLastColumn(viterbi.getValue()));
         System.out.println("; log P(x,z) (as computer by your log-joint-prob) = " + calculator.jointLogProbability(model, seq, viterbiPath));
-        System.out.println("\n");
+        System.out.println(System.lineSeparator());
       }
 */
     } catch (Exception e) {
