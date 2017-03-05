@@ -11,8 +11,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.ejml:all:0.30" level="project" />
+    <orderEntry type="library" name="Maven: org.ejml:simple:0.30" level="project" />
     <orderEntry type="library" name="Maven: org.ejml:core:0.30" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.ejml:dense64:0.30" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.6.1" level="project" />
   </component>
 </module>
