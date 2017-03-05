@@ -23,8 +23,7 @@ public class Main {
 
       // Respect this order when creating the matrices
       Character[] hiddenOrder = new Character[]{'i', 'M', 'o'};
-      Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K',
-          'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
+      Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
       MarkovCalculator calculator = new MarkovCalculator();
 
       // Run 10 fold test where we ignore 1 dataset and train by the others.
@@ -33,7 +32,6 @@ public class Main {
         Observations observations = new ObservationsFromFile(null);
         for (int j = 0; j < sets; j++) {
           if (j == ignore) {
-            // Ignoring
             continue;
           }
           // Read observations from file and add it to the observations
@@ -57,7 +55,7 @@ public class Main {
 
           out.write(name + "\n");
           out.write(seq + "\n");
-          out.write("#\n" );
+          out.write("#\n");
 
           Pair<List<Integer>, SimpleMatrix> viterbi = calculator.viterbi(model, seq);
           List<Integer> viterbiPathIdx = viterbi.getKey();
@@ -80,7 +78,11 @@ public class Main {
         BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
         StringBuilder sb = new StringBuilder();
-        for (String l; (l = in.readLine()) != null; sb.append(l + "\n"));
+
+        for (String l; (l = in.readLine()) != null; sb.append(l + "\n")) {
+          ;
+        }
+
         String res = sb.toString();
 
         // Write the output of the comparing tool to file

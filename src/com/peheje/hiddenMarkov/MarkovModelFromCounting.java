@@ -1,51 +1,58 @@
 package com.peheje.hiddenMarkov;
 
+import org.ejml.simple.SimpleMatrix;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.ejml.simple.SimpleMatrix;
 
 public class MarkovModelFromCounting implements MarkovModel {
 
   private final Character[] observableOrder;
   private final Character[] stateOrder;
+  private final List<String> hidden = new ArrayList<>();
+  private final Map<Character, Integer> hiddenLookup;
+  private final List<String> observables = new ArrayList<>();
+  private final Map<Character, Integer> observablesLookup;
   private Observations observations;
 
 
-  public MarkovModelFromCounting(Observations observations, Character[] stateOrder,
-      Character[] observableOrder) {
+  public MarkovModelFromCounting(Observations observations, Character[] stateOrder, Character[] observableOrder) {
     this.observations = observations;
     this.stateOrder = stateOrder;
     this.observableOrder = observableOrder;
+
+
+    for (Character c : stateOrder) {
+      this.hidden.add(c.toString());
+    }
+    this.hiddenLookup = lookup(this.hidden);
+
+    for (Character c : observableOrder) {
+      this.observables.add(c.toString());
+    }
+    this.observablesLookup = lookup(this.observables);
   }
 
   @Override
   public List<String> getHidden() {
-    List<String> ret = new ArrayList<>();
-    for (Character c : stateOrder) {
-      ret.add(c.toString());
-    }
-    return ret;
+    return hidden;
   }
 
   @Override
   public Map<Character, Integer> getHiddenMap() {
-    return Lookup(getHidden());
+    return hiddenLookup;
   }
 
   @Override
   public List<String> getObservables() {
-    List<String> ret = new ArrayList<>();
-    for (Character c : observableOrder) {
-      ret.add(c.toString());
-    }
-    return ret;
+    return observables;
   }
 
   @Override
   public Map<Character, Integer> getObservablesMap() {
-    return Lookup(getObservables());
+    return observablesLookup;
   }
 
   @Override
@@ -106,7 +113,8 @@ public class MarkovModelFromCounting implements MarkovModel {
     // Divide
     for (int i = 0; i < m.numCols(); i++) {
       for (int j = 0; j < m.numRows(); j++) {
-        int count = stateMap.get(stateOrder[j]).count;
+        Character s = stateOrder[j];
+        int count = stateMap.get(s).count;
         m.set(j, i, m.get(j, i) / (double) count);
       }
     }

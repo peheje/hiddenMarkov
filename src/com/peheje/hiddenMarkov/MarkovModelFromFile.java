@@ -52,8 +52,8 @@ public class MarkovModelFromFile implements MarkovModel {
       }
     }
 
-    observablesMap = Lookup(observables);
-    hiddenMap = Lookup(hidden);
+    observablesMap = lookup(observables);
+    hiddenMap = lookup(hidden);
 
   }
 

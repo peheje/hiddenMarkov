@@ -21,7 +21,7 @@ public interface MarkovModel {
 
   SimpleMatrix getEmissions();
 
-  default Map<Character, Integer> Lookup(List<String> list) {
+  default Map<Character, Integer> lookup(List<String> list) {
     Map<Character, Integer> map = new HashMap<>();
     for (int i = 0; i < list.size(); i++) {
       map.put(list.get(i).charAt(0), i);
