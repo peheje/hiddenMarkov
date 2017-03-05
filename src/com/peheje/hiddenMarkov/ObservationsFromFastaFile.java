@@ -7,13 +7,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ObservationsFromFile implements Observations {
+public class ObservationsFromFastaFile implements Observations {
 
   private List<String> names = new ArrayList<>();
   private List<String> sequences = new ArrayList<>();
   private List<String> states = new ArrayList<>();
 
-  public ObservationsFromFile(String path) throws IOException {
+  public ObservationsFromFastaFile(String path) throws IOException {
     if (path == null) return;
 
     List<String> lines = Files.readAllLines(Paths.get(path), StandardCharsets.ISO_8859_1);

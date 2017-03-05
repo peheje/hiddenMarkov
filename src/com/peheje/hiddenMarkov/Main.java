@@ -20,17 +20,17 @@ public class Main {
 
   public static void main(String[] args) {
     //E2();
-    E3();
+    //E3(new Character[]{'i', 'M', 'o'}, "3state");
+    E3(new Character[]{'i', 'A', 'M', 'B', 'o'}, "4state");
   }
 
-  public static void E3() {
+  public static void E3(Character[] hiddenOrder, String prefix) {
     try {
       final String dir = System.getProperty("user.dir");
       final String datasetPath = "/Dataset160/set160.";
       final int sets = 10;
 
       // Respect this order when creating the matrices.
-      Character[] hiddenOrder = new Character[]{'i', 'M', 'o'};
       Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
       MarkovCalculator calculator = new MarkovCalculator();
 
@@ -41,13 +41,13 @@ public class Main {
       double[] acArr = new double[sets];
 
       for (int ignoreIdx = 0; ignoreIdx < sets; ignoreIdx++) {
-        Observations observations = new ObservationsFromFile(null);
+        Observations observations = new ObservationsFromFastaFile(null);
         for (int j = 0; j < sets; j++) {
           if (j == ignoreIdx) {
             continue;
           }
           // Read observations from file and add it to the observations.
-          observations.add(new ObservationsFromFile(dir + datasetPath + j + ".labels.txt"));
+          observations.add(new ObservationsFromFastaFile(dir + datasetPath + j + ".labels.txt"));
         }
 
         // Create the markov model by counting.
@@ -55,7 +55,7 @@ public class Main {
 
         // Viterbi decoding on the ignored.
         final String ignorePath = dir + datasetPath + ignoreIdx + ".labels.txt";
-        Observations ignoredObservations = new ObservationsFromFile(ignorePath);
+        Observations ignoredObservations = new ObservationsFromFastaFile(ignorePath);
 
         // Write the result in the fasta format for comparing tool to read.
         BufferedWriter out = new BufferedWriter(new FileWriter(dir + "/tmp_kfold.txt"));
@@ -107,7 +107,7 @@ public class Main {
 
         // Write the output of the comparing tool to file.
         String res = String.join("\n", listResult);
-        out = new BufferedWriter(new FileWriter(dir + "/result_project_3_" + ignoreIdx + ".txt"));
+        out = new BufferedWriter(new FileWriter(dir + "/" + prefix + "_result_project_3_" + ignoreIdx + ".txt"));
         if (ignoreIdx == 0) {
           out.write("");  // Delete content
         }
@@ -117,7 +117,7 @@ public class Main {
 
       // Calculate mean and variance
       Statistics st = new Statistics(acArr);
-      Path file = Paths.get("result_project_3_AC.txt");
+      Path file = Paths.get(prefix + "_result_project_3_AC.txt");
       Files.write(file, Arrays.asList("AC mean: " + st.getMean(), "AC variance: " + st.getVariance()), StandardCharsets.UTF_8);
     } catch (Exception e) {
       e.printStackTrace();
@@ -128,7 +128,7 @@ public class Main {
     try {
       String dir = System.getProperty("user.dir");
       MarkovModel model = new MarkovModelFromFile(dir + "/model.txt");
-      Observations observations = new ObservationsFromFile(dir + "/seq1.txt");
+      Observations observations = new ObservationsFromFastaFile(dir + "/seq1.txt");
 
       List<String> sequences = observations.getSequences();
       List<String> states = observations.getStates();
