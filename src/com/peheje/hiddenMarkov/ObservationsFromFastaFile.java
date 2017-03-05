@@ -14,7 +14,9 @@ public class ObservationsFromFastaFile implements Observations {
   private List<String> states = new ArrayList<>();
 
   public ObservationsFromFastaFile(String path) throws IOException {
-    if (path == null) return;
+    if (path == null) {
+      return;
+    }
 
     List<String> lines = Files.readAllLines(Paths.get(path), StandardCharsets.ISO_8859_1);
     for (int i = 0; i < lines.size(); i++) {

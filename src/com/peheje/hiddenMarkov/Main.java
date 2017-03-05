@@ -21,7 +21,7 @@ public class Main {
   public static void main(String[] args) {
     //E2();
     //E3(new Character[]{'i', 'M', 'o'}, "3state");
-    E3(new Character[]{'i', 'A', 'M', 'B', 'o'}, "4state");
+    E3(new Character[]{'i', 'L', 'o', 'E'}, "4state");
   }
 
   public static void E3(Character[] hiddenOrder, String prefix) {
@@ -29,6 +29,7 @@ public class Main {
       final String dir = System.getProperty("user.dir");
       final String datasetPath = "/Dataset160/set160.";
       final int sets = 10;
+      final int stateModel = hiddenOrder.length;
 
       // Respect this order when creating the matrices.
       Character[] observableOrder = new Character[]{'A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y'};
@@ -41,21 +42,25 @@ public class Main {
       double[] acArr = new double[sets];
 
       for (int ignoreIdx = 0; ignoreIdx < sets; ignoreIdx++) {
-        Observations observations = new ObservationsFromFastaFile(null);
+        Observations observations = stateModel == 4 ? new FourStateHelixObservations(null) : new ObservationsFromFastaFile(null);
         for (int j = 0; j < sets; j++) {
           if (j == ignoreIdx) {
             continue;
           }
           // Read observations from file and add it to the observations.
-          observations.add(new ObservationsFromFastaFile(dir + datasetPath + j + ".labels.txt"));
+          String obsPath = dir + datasetPath + j + ".labels.txt";
+          Observations set = stateModel == 4 ? new FourStateHelixObservations(obsPath) : new ObservationsFromFastaFile(obsPath);
+          observations.add(set);
         }
 
         // Create the markov model by counting.
         MarkovModel model = new MarkovModelFromCounting(observations, hiddenOrder, observableOrder);
 
+        model.getEmissions().print();
+
         // Viterbi decoding on the ignored.
         final String ignorePath = dir + datasetPath + ignoreIdx + ".labels.txt";
-        Observations ignoredObservations = new ObservationsFromFastaFile(ignorePath);
+        Observations ignoredObservations = stateModel == 4 ? new FourStateHelixObservations(ignorePath) : new ObservationsFromFastaFile(ignorePath);
 
         // Write the result in the fasta format for comparing tool to read.
         BufferedWriter out = new BufferedWriter(new FileWriter(dir + "/tmp_kfold.txt"));
