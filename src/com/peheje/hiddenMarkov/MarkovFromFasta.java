@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.ejml.simple.SimpleMatrix;
 
-public class MarkovModelFromFile implements MarkovModel {
+public class MarkovFromFasta implements MarkovModel {
 
   private List<String> hidden;
   private Map<Character, Integer> hiddenMap;
@@ -20,7 +20,7 @@ public class MarkovModelFromFile implements MarkovModel {
   private SimpleMatrix transitions;
   private SimpleMatrix emissions;
 
-  public MarkovModelFromFile(String path) throws IOException {
+  public MarkovFromFasta(String path) throws IOException {
     List<String> lines = Files.readAllLines(Paths.get(path));
     for (int i = 0; i < lines.size() - 1; i++) {
       String l = lines.get(i);

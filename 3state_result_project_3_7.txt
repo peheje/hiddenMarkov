@@ -1,0 +1,50 @@
+>5H1A_HUMAN
+Sn = 0.5376, Sp = 0.9789, CC = 0.6236, AC = 0.6319
+
+>A2AA_HUMAN
+Sn = 0.6821, Sp = 0.9077, CC = 0.6856, AC = 0.6873
+
+>AA1R_CANFA
+Sn = 0.8364, Sp = 0.8214, CC = 0.6503, AC = 0.6503
+
+>AA2A_CANFA
+Sn = 0.8909, Sp = 0.7778, CC = 0.7089, AC = 0.7090
+
+>CB21_PEA
+Sn = 0.0000, Sp = inf, CC = inf, AC = inf
+
+>CVAA_ECOLI
+Sn = 1.0000, Sp = 0.7333, CC = 0.8475, AC = 0.8564
+
+>CYOD_ECOLI
+Sn = 1.0000, Sp = 0.7037, CC = 0.6156, AC = 0.6211
+
+>EDG1_HUMAN
+Sn = 0.5215, Sp = 0.8416, CC = 0.5023, AC = 0.5055
+
+>GLRA_RAT
+Sn = 0.7468, Sp = 0.8082, CC = 0.7566, AC = 0.7571
+
+>GP1B_HUMAN
+Sn = 1.0000, Sp = 0.8929, CC = 0.9370, AC = 0.9381
+
+>GSPG_ERWCA
+Sn = 0.9524, Sp = 0.9091, CC = 0.9194, AC = 0.9196
+
+>GSPH_ERWCA
+Sn = 0.9048, Sp = 0.7600, CC = 0.8060, AC = 0.8083
+
+>IGGB_STRSP
+Sn = 0.9048, Sp = 0.4872, CC = 0.6432, AC = 0.6701
+
+>IL2A_HUMAN
+Sn = 1.0000, Sp = 0.9048, CC = 0.9474, AC = 0.9484
+
+>MALF_ECOLI
+Sn = 0.6250, Sp = 0.7540, CC = 0.5722, AC = 0.5732
+
+>PTGB_ECOLI
+Sn = 0.6623, Sp = 0.6681, CC = 0.3535, AC = 0.3535
+
+Summary (over all sequences):
+Sn = 0.6919, Sp = 0.7878, CC = 0.6539, AC = 0.6546

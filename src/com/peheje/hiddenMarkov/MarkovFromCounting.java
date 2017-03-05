@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MarkovModelFromCounting implements MarkovModel {
+public class MarkovFromCounting implements MarkovModel {
 
   private final Character[] observableOrder;
   private final Character[] stateOrder;
@@ -18,7 +18,7 @@ public class MarkovModelFromCounting implements MarkovModel {
   private Observations observations;
 
 
-  public MarkovModelFromCounting(Observations observations, Character[] stateOrder, Character[] observableOrder) {
+  public MarkovFromCounting(Observations observations, Character[] stateOrder, Character[] observableOrder) {
     this.observations = observations;
     this.stateOrder = stateOrder;
     this.observableOrder = observableOrder;

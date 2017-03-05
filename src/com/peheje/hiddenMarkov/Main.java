@@ -42,25 +42,23 @@ public class Main {
       double[] acArr = new double[sets];
 
       for (int ignoreIdx = 0; ignoreIdx < sets; ignoreIdx++) {
-        Observations observations = stateModel == 4 ? new FourStateHelixObservations(null) : new ObservationsFromFastaFile(null);
+        Observations observations = stateModel == 4 ? new FourStateHelixObservations(null) : new ObservationsFromFasta(null);
         for (int j = 0; j < sets; j++) {
           if (j == ignoreIdx) {
             continue;
           }
           // Read observations from file and add it to the observations.
           String obsPath = dir + datasetPath + j + ".labels.txt";
-          Observations set = stateModel == 4 ? new FourStateHelixObservations(obsPath) : new ObservationsFromFastaFile(obsPath);
+          Observations set = stateModel == 4 ? new FourStateHelixObservations(obsPath) : new ObservationsFromFasta(obsPath);
           observations.add(set);
         }
 
         // Create the markov model by counting.
-        MarkovModel model = new MarkovModelFromCounting(observations, hiddenOrder, observableOrder);
-
-        model.getEmissions().print();
+        MarkovModel model = new MarkovFromCounting(observations, hiddenOrder, observableOrder);
 
         // Viterbi decoding on the ignored.
         final String ignorePath = dir + datasetPath + ignoreIdx + ".labels.txt";
-        Observations ignoredObservations = stateModel == 4 ? new FourStateHelixObservations(ignorePath) : new ObservationsFromFastaFile(ignorePath);
+        Observations ignoredObservations = stateModel == 4 ? new FourStateHelixObservations(ignorePath) : new ObservationsFromFasta(ignorePath);
 
         // Write the result in the fasta format for comparing tool to read.
         BufferedWriter out = new BufferedWriter(new FileWriter(dir + "/tmp_kfold.txt"));
@@ -132,8 +130,8 @@ public class Main {
   public static void E2() {
     try {
       String dir = System.getProperty("user.dir");
-      MarkovModel model = new MarkovModelFromFile(dir + "/model.txt");
-      Observations observations = new ObservationsFromFastaFile(dir + "/seq1.txt");
+      MarkovModel model = new MarkovFromFasta(dir + "/model.txt");
+      Observations observations = new ObservationsFromFasta(dir + "/seq1.txt");
 
       List<String> sequences = observations.getSequences();
       List<String> states = observations.getStates();

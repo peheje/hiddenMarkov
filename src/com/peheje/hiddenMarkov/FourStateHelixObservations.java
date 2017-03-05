@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FourStateHelixObservations extends ObservationsFromFastaFile {
+public class FourStateHelixObservations extends ObservationsFromFasta {
 
   public FourStateHelixObservations(String path) throws IOException {
     super(path);
