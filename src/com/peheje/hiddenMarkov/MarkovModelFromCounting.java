@@ -78,10 +78,10 @@ public class MarkovModelFromCounting implements MarkovModel {
       pi.add(divided);
     }
 
-    System.out.println("Initial");
+    /*System.out.println("Initial");
     for (double d : pi) {
       System.out.println(d);
-    }
+    }*/
 
     return pi;
   }
@@ -119,8 +119,8 @@ public class MarkovModelFromCounting implements MarkovModel {
       }
     }
 
-    System.out.println("Transitions");
-    m.print(6,6);
+    //System.out.println("Transitions");
+    //m.print(6,6);
     return m;
   }
 
@@ -171,8 +171,8 @@ public class MarkovModelFromCounting implements MarkovModel {
       }
     }
 
-    System.out.println("Emmisions");
-    m.print(6,6);
+    //System.out.println("Emmisions");
+    //m.print(6,6);
     return m;
   }
 
@@ -186,5 +186,4 @@ public class MarkovModelFromCounting implements MarkovModel {
       this.count = count;
     }
   }
-
 }
