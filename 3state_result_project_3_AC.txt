@@ -1,2 +1,2 @@
-AC mean: 0.674
-AC variance: 0.004116751999999998
+AC mean: 0.67645
+AC variance: 0.004345906499999998

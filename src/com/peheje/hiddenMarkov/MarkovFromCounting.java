@@ -98,7 +98,7 @@ public class MarkovFromCounting implements MarkovModel {
         char nex = z.charAt(i + 1);
         int curi = hiddenLookup.get(cur);
         int nexi = hiddenLookup.get(nex);
-        m.set(nexi, curi, m.get(nexi, curi) + 1);
+        m.set(curi, nexi, m.get(curi, nexi) + 1);
       }
     }
 
